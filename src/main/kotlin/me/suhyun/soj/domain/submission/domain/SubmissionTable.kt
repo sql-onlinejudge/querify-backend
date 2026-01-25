@@ -1,6 +1,6 @@
 package me.suhyun.soj.domain.submission.domain
 
-import me.suhyun.soj.domain.problem.domain.ProblemTable
+import me.suhyun.soj.domain.problem.domain.entity.ProblemTable
 import me.suhyun.soj.domain.submission.domain.enums.SubmissionStatus
 import me.suhyun.soj.domain.submission.domain.enums.SubmissionVerdict
 import me.suhyun.soj.global.entity.BaseTable

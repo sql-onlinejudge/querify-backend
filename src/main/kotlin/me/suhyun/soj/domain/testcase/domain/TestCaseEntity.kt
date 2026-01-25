@@ -1,6 +1,6 @@
 package me.suhyun.soj.domain.testcase.domain
 
-import me.suhyun.soj.domain.problem.domain.ProblemEntity
+import me.suhyun.soj.domain.problem.domain.entity.ProblemEntity
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
