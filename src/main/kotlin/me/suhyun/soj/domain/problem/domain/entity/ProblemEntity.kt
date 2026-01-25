@@ -1,4 +1,4 @@
-package me.suhyun.soj.domain.problem.domain
+package me.suhyun.soj.domain.problem.domain.entity
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
