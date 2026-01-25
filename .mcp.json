@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "mysql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@liangshanli/mcp-server-mysql"
+      ],
+      "env": {
+        "MYSQL_HOST": "127.0.0.1",
+        "MYSQL_PORT": "3308",
+        "MYSQL_USER": "soj",
+        "MYSQL_PASSWORD": "soj123",
+        "MYSQL_DATABASE": "soj",
+        "MYSQL_ALLOW_DDL": "true"
+      }
+    }
+  }
+}

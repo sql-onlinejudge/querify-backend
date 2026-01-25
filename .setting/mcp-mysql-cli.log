@@ -1,0 +1,29 @@
+2026-01-11T01:06:52.745Z | INFO | Starting MCP MySQL server from: /Users/osoohynn/.npm/_npx/080bc9f59514dad9/node_modules/@liangshanli/mcp-server-mysql/src/server-final.js
+2026-01-11T01:06:52.749Z | INFO | Starting MCP MySQL server with environment: | {"MYSQL_HOST":"127.0.0.1","MYSQL_PORT":"3308","MYSQL_USER":"soj","MYSQL_DATABASE":"soj","READONLY":"false","ALLOW_DDL":"false","ALLOW_DROP":"false","ALLOW_DELETE":"false","TOOL_PREFIX":"(not set)","PROJECT_NAME":"(not set)","MCP_LOG_DIR":"./.setting","MCP_DDL_LOG_FILE":"ddl.sql"}
+2026-01-11T01:06:52.751Z | INFO | MCP MySQL server process started with PID: 81329
+2026-01-11T01:06:52.752Z | INFO | Signal handlers registered for SIGINT and SIGTERM
+2026-01-11T01:06:52.752Z | INFO | Press Ctrl+C to gracefully shutdown the server
+2026-01-11T01:13:58.230Z | INFO | Starting MCP MySQL server from: /Users/osoohynn/.npm/_npx/080bc9f59514dad9/node_modules/@liangshanli/mcp-server-mysql/src/server-final.js
+2026-01-11T01:13:58.234Z | INFO | Starting MCP MySQL server with environment: | {"MYSQL_HOST":"127.0.0.1","MYSQL_PORT":"3308","MYSQL_USER":"soj","MYSQL_DATABASE":"soj","READONLY":"false","ALLOW_DDL":"false","ALLOW_DROP":"false","ALLOW_DELETE":"false","TOOL_PREFIX":"(not set)","PROJECT_NAME":"(not set)","MCP_LOG_DIR":"./.setting","MCP_DDL_LOG_FILE":"ddl.sql"}
+2026-01-11T01:13:58.236Z | INFO | MCP MySQL server process started with PID: 81947
+2026-01-11T01:13:58.236Z | INFO | Signal handlers registered for SIGINT and SIGTERM
+2026-01-11T01:13:58.236Z | INFO | Press Ctrl+C to gracefully shutdown the server
+2026-01-11T09:37:12.566Z | INFO | Starting MCP MySQL server from: /Users/osoohynn/.npm/_npx/080bc9f59514dad9/node_modules/@liangshanli/mcp-server-mysql/src/server-final.js
+2026-01-11T09:37:12.598Z | INFO | Starting MCP MySQL server with environment: | {"MYSQL_HOST":"127.0.0.1","MYSQL_PORT":"3308","MYSQL_USER":"soj","MYSQL_DATABASE":"soj","READONLY":"false","ALLOW_DDL":"false","ALLOW_DROP":"false","ALLOW_DELETE":"false","TOOL_PREFIX":"(not set)","PROJECT_NAME":"(not set)","MCP_LOG_DIR":"./.setting","MCP_DDL_LOG_FILE":"ddl.sql"}
+2026-01-11T09:37:12.622Z | INFO | MCP MySQL server process started with PID: 89144
+2026-01-11T09:37:12.622Z | INFO | Signal handlers registered for SIGINT and SIGTERM
+2026-01-11T09:37:12.623Z | INFO | Press Ctrl+C to gracefully shutdown the server
+2026-01-15T06:27:15.295Z | INFO | Received SIGTERM, shutting down server...
+2026-01-15T06:27:15.323Z | INFO | Sent SIGTERM signal to server process 89144
+2026-01-15T06:27:15.515Z | INFO | MCP MySQL server exited with code: 0
+2026-01-15T06:27:15.516Z | INFO | Server requested restart, restarting...
+2026-01-15T06:27:17.533Z | INFO | Starting MCP MySQL server with environment: | {"MYSQL_HOST":"127.0.0.1","MYSQL_PORT":"3308","MYSQL_USER":"soj","MYSQL_DATABASE":"soj","READONLY":"false","ALLOW_DDL":"false","ALLOW_DROP":"false","ALLOW_DELETE":"false","TOOL_PREFIX":"(not set)","PROJECT_NAME":"(not set)","MCP_LOG_DIR":"./.setting","MCP_DDL_LOG_FILE":"ddl.sql"}
+2026-01-15T06:27:17.569Z | INFO | MCP MySQL server process started with PID: 62371
+2026-01-15T06:27:17.570Z | INFO | Signal handlers registered for SIGINT and SIGTERM
+2026-01-15T06:27:17.571Z | INFO | Press Ctrl+C to gracefully shutdown the server
+2026-01-15T06:27:18.373Z | INFO | CLI process exiting with code: 0
+2026-01-19T13:46:46.653Z | INFO | Starting MCP MySQL server from: /Users/osoohynn/.npm/_npx/080bc9f59514dad9/node_modules/@liangshanli/mcp-server-mysql/src/server-final.js
+2026-01-19T13:46:46.658Z | INFO | Starting MCP MySQL server with environment: | {"MYSQL_HOST":"127.0.0.1","MYSQL_PORT":"3308","MYSQL_USER":"soj","MYSQL_DATABASE":"soj","READONLY":"false","ALLOW_DDL":"false","ALLOW_DROP":"false","ALLOW_DELETE":"false","TOOL_PREFIX":"(not set)","PROJECT_NAME":"(not set)","MCP_LOG_DIR":"./.setting","MCP_DDL_LOG_FILE":"ddl.sql"}
+2026-01-19T13:46:46.660Z | INFO | MCP MySQL server process started with PID: 97861
+2026-01-19T13:46:46.661Z | INFO | Signal handlers registered for SIGINT and SIGTERM
+2026-01-19T13:46:46.661Z | INFO | Press Ctrl+C to gracefully shutdown the server
