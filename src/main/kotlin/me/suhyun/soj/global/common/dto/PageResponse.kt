@@ -1,4 +1,4 @@
-package me.suhyun.soj.global.dto
+package me.suhyun.soj.global.common.dto
 
 data class PageResponse<T>(
     val content: List<T>,

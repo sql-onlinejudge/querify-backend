@@ -1,4 +1,4 @@
-package me.suhyun.soj.global.entity
+package me.suhyun.soj.global.common.entity
 
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.datetime

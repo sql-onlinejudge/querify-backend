@@ -6,7 +6,7 @@ data class ErrorResponse(
 ) {
     companion object {
         fun of(errorCode: ErrorCode) = ErrorResponse(
-            code = errorCode.code,
+            code = (errorCode as Enum<*>).name,
             message = errorCode.message
         )
     }

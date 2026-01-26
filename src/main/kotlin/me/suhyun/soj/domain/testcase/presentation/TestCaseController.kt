@@ -23,17 +23,17 @@ class TestCaseController(
         testCaseService.create(problemId, request)
     }
 
+    @GetMapping
+    fun findAll(@PathVariable problemId: Long): List<TestCaseResponse> {
+        return testCaseService.findAll(problemId)
+    }
+
     @GetMapping("/{testcaseId}")
     fun findById(
         @PathVariable problemId: Long,
         @PathVariable testcaseId: Long
     ): TestCaseResponse {
         return testCaseService.findById(problemId, testcaseId)
-    }
-
-    @GetMapping
-    fun findAll(@PathVariable problemId: Long): List<TestCaseResponse> {
-        return testCaseService.findAll(problemId)
     }
 
     @PatchMapping("/{testcaseId}")

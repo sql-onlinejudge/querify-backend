@@ -60,13 +60,6 @@ class ProblemService(
     }
 
     @Transactional(readOnly = true)
-    fun findById(problemId: Long): ProblemDetailResponse {
-        val problem = problemRepository.findById(problemId)
-            ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
-        return ProblemDetailResponse.from(problem)
-    }
-
-    @Transactional(readOnly = true)
     fun findAll(
         page: Int,
         size: Int,
@@ -97,6 +90,13 @@ class ProblemService(
         )
     }
 
+    @Transactional(readOnly = true)
+    fun findById(problemId: Long): ProblemDetailResponse {
+        val problem = problemRepository.findById(problemId)
+            ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+        return ProblemDetailResponse.from(problem)
+    }
+
     fun update(problemId: Long, request: UpdateProblemRequest) {
         problemRepository.update(
             id = problemId,
@@ -118,7 +118,7 @@ class ProblemService(
 
     private fun getTrialStatuses(problemIds: List<Long>, userId: UUID): Map<Long, TrialStatus> {
         if (problemIds.isEmpty()) return emptyMap()
-        val statuses = submissionRepository.getTrialStatuses(problemIds, userId.toString())
+        val statuses = submissionRepository.getTrialStatuses(problemIds, userId)
         return problemIds.associateWith { problemId ->
             when {
                 problemId !in statuses -> TrialStatus.NOT_ATTEMPTED

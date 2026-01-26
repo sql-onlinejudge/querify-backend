@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
+@Transactional
 class TestCaseService(
     private val testCaseRepository: TestCaseRepository,
     private val problemRepository: ProblemRepository,
 ) {
 
-    @Transactional
     fun create(problemId: Long, request: CreateTestCaseRequest) {
         val problem = problemRepository.findById(problemId)
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
@@ -38,6 +38,12 @@ class TestCaseService(
     }
 
     @Transactional(readOnly = true)
+    fun findAll(problemId: Long): List<TestCaseResponse> {
+        return testCaseRepository.findAllByProblemId(problemId)
+            .map { TestCaseResponse.from(it) }
+    }
+
+    @Transactional(readOnly = true)
     fun findById(problemId: Long, testcaseId: Long): TestCaseResponse {
         val testCase = testCaseRepository.findById(testcaseId)
             ?: throw BusinessException(TestCaseErrorCode.TEST_CASE_NOT_FOUND)
@@ -47,13 +53,6 @@ class TestCaseService(
         return TestCaseResponse.from(testCase)
     }
 
-    @Transactional(readOnly = true)
-    fun findAll(problemId: Long): List<TestCaseResponse> {
-        return testCaseRepository.findAllByProblemId(problemId)
-            .map { TestCaseResponse.from(it) }
-    }
-
-    @Transactional
     fun update(problemId: Long, testcaseId: Long, request: UpdateTestCaseRequest) {
         val testCase = testCaseRepository.findById(testcaseId)
             ?: throw BusinessException(TestCaseErrorCode.TEST_CASE_NOT_FOUND)
@@ -63,7 +62,6 @@ class TestCaseService(
         testCaseRepository.update(testcaseId, request.initSql, request.answer)
     }
 
-    @Transactional
     fun delete(problemId: Long, testcaseId: Long) {
         val testCase = testCaseRepository.findById(testcaseId)
             ?: throw BusinessException(TestCaseErrorCode.TEST_CASE_NOT_FOUND)
