@@ -33,6 +33,4 @@ data class Problem(
             deletedAt = entity.deletedAt
         )
     }
-
-    fun isDeleted(): Boolean = deletedAt != null
 }

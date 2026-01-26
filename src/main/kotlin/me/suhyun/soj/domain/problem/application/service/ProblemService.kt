@@ -1,55 +1,81 @@
 package me.suhyun.soj.domain.problem.application.service
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
 import me.suhyun.soj.domain.problem.presentation.request.CreateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.request.UpdateProblemRequest
-import me.suhyun.soj.global.dto.PageResponse
+import me.suhyun.soj.domain.problem.presentation.response.ProblemDetailResponse
+import me.suhyun.soj.domain.problem.presentation.response.ProblemResponse
+import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
+import me.suhyun.soj.domain.testcase.domain.model.TestCase
+import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
+import me.suhyun.soj.global.common.dto.PageResponse
 import me.suhyun.soj.global.exception.BusinessException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
+@Transactional
 class ProblemService(
-    private val problemRepository: ProblemRepository
+    private val problemRepository: ProblemRepository,
+    private val testCaseRepository: TestCaseRepository,
+    private val submissionRepository: SubmissionRepository
 ) {
 
-    @Transactional
-    fun createProblem(request: CreateProblemRequest): Problem {
-        val problem = Problem(
-            id = null,
-            title = request.title,
-            description = request.description,
-            schemaSql = request.schemaSql,
-            difficulty = request.difficulty,
-            timeLimit = request.timeLimit,
-            isOrderSensitive = request.isOrderSensitive,
-            solvedCount = 0,
-            submissionCount = 0,
-            createdAt = LocalDateTime.now(),
-            updatedAt = null,
-            deletedAt = null
+    fun create(request: CreateProblemRequest) {
+        val savedProblem = problemRepository.save(
+            Problem(
+                id = null,
+                title = request.title,
+                description = request.description,
+                schemaSql = request.schemaSql,
+                difficulty = request.difficulty,
+                timeLimit = request.timeLimit,
+                isOrderSensitive = request.isOrderSensitive,
+                solvedCount = 0,
+                submissionCount = 0,
+                createdAt = LocalDateTime.now(),
+                updatedAt = null,
+                deletedAt = null
+            )
         )
-        return problemRepository.save(problem)
+
+        request.testcases.forEach { input ->
+            testCaseRepository.save(
+                TestCase(
+                    id = null,
+                    problemId = savedProblem.id!!,
+                    initSql = input.initSql,
+                    answer = input.answer,
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = null,
+                    deletedAt = null
+                )
+            )
+        }
     }
 
     @Transactional(readOnly = true)
-    fun getProblem(id: Long): Problem {
-        return problemRepository.findById(id)
+    fun findById(problemId: Long): ProblemDetailResponse {
+        val problem = problemRepository.findById(problemId)
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+        return ProblemDetailResponse.from(problem)
     }
 
     @Transactional(readOnly = true)
-    fun getProblemList(
+    fun findAll(
         page: Int,
         size: Int,
         difficulty: Int?,
         keyword: String?,
         sortBy: String,
-        sortDirection: String
-    ): PageResponse<Problem> {
+        sortDirection: String,
+        userId: UUID
+    ): PageResponse<ProblemResponse> {
         val problems = problemRepository.findAll(
             page = page,
             size = size,
@@ -60,18 +86,20 @@ class ProblemService(
         )
         val totalElements = problemRepository.countAll(difficulty, keyword)
 
+        val problemIds = problems.mapNotNull { it.id }
+        val trialStatuses = getTrialStatuses(problemIds, userId)
+
         return PageResponse.of(
-            content = problems,
+            content = problems.map { ProblemResponse.from(it, trialStatuses[it.id]) },
             page = page,
             size = size,
             totalElements = totalElements
         )
     }
 
-    @Transactional
-    fun updateProblem(id: Long, request: UpdateProblemRequest): Problem {
-        return problemRepository.update(
-            id = id,
+    fun update(problemId: Long, request: UpdateProblemRequest) {
+        problemRepository.update(
+            id = problemId,
             title = request.title,
             description = request.description,
             schemaSql = request.schemaSql,
@@ -81,11 +109,22 @@ class ProblemService(
         ) ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
     }
 
-    @Transactional
-    fun deleteProblem(id: Long) {
-        val deleted = problemRepository.softDelete(id)
+    fun delete(problemId: Long) {
+        val deleted = problemRepository.softDelete(problemId)
         if (!deleted) {
             throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+        }
+    }
+
+    private fun getTrialStatuses(problemIds: List<Long>, userId: UUID): Map<Long, TrialStatus> {
+        if (problemIds.isEmpty()) return emptyMap()
+        val statuses = submissionRepository.getTrialStatuses(problemIds, userId.toString())
+        return problemIds.associateWith { problemId ->
+            when {
+                problemId !in statuses -> TrialStatus.NOT_ATTEMPTED
+                statuses[problemId] == true -> TrialStatus.SOLVED
+                else -> TrialStatus.ATTEMPTED
+            }
         }
     }
 }

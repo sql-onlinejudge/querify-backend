@@ -17,18 +17,20 @@ data class ProblemDetailResponse(
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(problem: Problem) = ProblemDetailResponse(
-            id = problem.id!!,
-            title = problem.title,
-            description = problem.description,
-            schemaSql = problem.schemaSql,
-            difficulty = problem.difficulty,
-            timeLimit = problem.timeLimit,
-            isOrderSensitive = problem.isOrderSensitive,
-            solvedCount = problem.solvedCount,
-            submissionCount = problem.submissionCount,
-            createdAt = problem.createdAt,
-            updatedAt = problem.updatedAt
-        )
+        fun from(problem: Problem): ProblemDetailResponse {
+            return ProblemDetailResponse(
+                id = problem.id!!,
+                title = problem.title,
+                description = problem.description,
+                schemaSql = problem.schemaSql,
+                difficulty = problem.difficulty,
+                timeLimit = problem.timeLimit,
+                isOrderSensitive = problem.isOrderSensitive,
+                solvedCount = problem.solvedCount,
+                submissionCount = problem.submissionCount,
+                createdAt = problem.createdAt,
+                updatedAt = problem.updatedAt
+            )
+        }
     }
 }

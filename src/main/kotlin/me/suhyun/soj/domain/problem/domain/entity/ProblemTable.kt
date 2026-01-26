@@ -1,6 +1,6 @@
 package me.suhyun.soj.domain.problem.domain.entity
 
-import me.suhyun.soj.global.entity.BaseTable
+import me.suhyun.soj.global.common.entity.BaseTable
 
 @Suppress("MagicNumber")
 object ProblemTable : BaseTable("problems") {

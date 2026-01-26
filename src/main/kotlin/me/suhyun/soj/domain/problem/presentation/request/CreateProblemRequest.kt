@@ -3,7 +3,9 @@ package me.suhyun.soj.domain.problem.presentation.request
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Positive
+import me.suhyun.soj.domain.testcase.presentation.request.CreateTestCaseRequest
 
 data class CreateProblemRequest(
     @field:NotBlank
@@ -22,5 +24,8 @@ data class CreateProblemRequest(
     @field:Positive
     val timeLimit: Int,
 
-    val isOrderSensitive: Boolean = false
+    val isOrderSensitive: Boolean = false,
+
+    @field:NotEmpty
+    val testcases: List<CreateTestCaseRequest>
 )
