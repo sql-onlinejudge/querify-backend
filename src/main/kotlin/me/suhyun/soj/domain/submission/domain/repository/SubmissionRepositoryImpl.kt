@@ -1,7 +1,9 @@
 package me.suhyun.soj.domain.submission.domain.repository
 
+import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.submission.domain.entity.SubmissionEntity
 import me.suhyun.soj.domain.submission.domain.entity.SubmissionTable
+import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionStatus
 import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionVerdict
 import me.suhyun.soj.domain.submission.domain.model.Submission
 import org.jetbrains.exposed.sql.SortOrder
@@ -84,5 +86,25 @@ class SubmissionRepositoryImpl : SubmissionRepository {
 
         return submissions.groupBy { it.problemId }
             .mapValues { (_, subs) -> subs.any { it.verdict == SubmissionVerdict.ACCEPTED } }
+    }
+
+    override fun getTrialStatus(problemId: Long, userId: UUID): TrialStatus {
+        val submissions = SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .andWhere { SubmissionTable.problemId eq problemId }
+            .andWhere { SubmissionTable.userId eq userId }
+            .map { SubmissionEntity.wrapRow(it) }
+
+        if (submissions.isEmpty()) return TrialStatus.NOT_ATTEMPTED
+        if (submissions.any { it.verdict == SubmissionVerdict.ACCEPTED }) return TrialStatus.SOLVED
+        return TrialStatus.ATTEMPTED
+    }
+
+    override fun updateStatus(id: Long, status: SubmissionStatus, verdict: SubmissionVerdict?): Boolean {
+        val entity = SubmissionEntity.findById(id) ?: return false
+        entity.status = status
+        entity.verdict = verdict
+        entity.updatedAt = LocalDateTime.now()
+        return true
     }
 }

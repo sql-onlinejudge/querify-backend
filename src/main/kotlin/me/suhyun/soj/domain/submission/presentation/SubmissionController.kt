@@ -21,9 +21,12 @@ class SubmissionController(
         @PathVariable problemId: Long,
         @RequestHeader("X-User-Id") userId: String,
         @Valid @RequestBody request: SubmitRequest
-    ) {
-        submissionService.submit(problemId, UUID.fromString(userId), request)
+    ): SubmitResponse {
+        val submissionId = submissionService.submit(problemId, UUID.fromString(userId), request)
+        return SubmitResponse(submissionId)
     }
+
+    data class SubmitResponse(val submissionId: Long)
 
     @GetMapping
     fun findAll(
@@ -35,7 +38,7 @@ class SubmissionController(
         return if (userId != null) {
             submissionService.findMyByProblemId(problemId, UUID.fromString(userId), page, size)
         } else {
-            submissionService.findByProblemId(problemId, page, size)
+            submissionService.findAllByProblemId(problemId, page, size)
         }
     }
 
