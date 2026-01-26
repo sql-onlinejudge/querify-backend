@@ -1,0 +1,71 @@
+package me.suhyun.soj.domain.submission.application.service
+
+import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionStatus
+import me.suhyun.soj.domain.submission.domain.model.Submission
+import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
+import me.suhyun.soj.domain.submission.exception.SubmissionErrorCode
+import me.suhyun.soj.domain.submission.presentation.request.SubmitRequest
+import me.suhyun.soj.domain.submission.presentation.response.SubmissionResponse
+import me.suhyun.soj.global.common.dto.PageResponse
+import me.suhyun.soj.global.exception.BusinessException
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.util.UUID
+
+@Service
+@Transactional
+class SubmissionService(
+    private val submissionRepository: SubmissionRepository
+) {
+
+    fun submit(problemId: Long, userId: UUID, request: SubmitRequest) {
+        submissionRepository.save(
+            Submission(
+                id = null,
+                problemId = problemId,
+                userId = userId,
+                query = request.query,
+                status = SubmissionStatus.PENDING,
+                verdict = null,
+                createdAt = LocalDateTime.now(),
+                updatedAt = null,
+                deletedAt = null
+            )
+        )
+    }
+
+    @Transactional(readOnly = true)
+    fun findByProblemId(problemId: Long, page: Int, size: Int): PageResponse<SubmissionResponse> {
+        val submissions = submissionRepository.findByProblemId(problemId, page, size)
+        val totalElements = submissionRepository.countByProblemId(problemId)
+        return PageResponse.of(
+            content = submissions.map { SubmissionResponse.from(it) },
+            page = page,
+            size = size,
+            totalElements = totalElements
+        )
+    }
+
+    @Transactional(readOnly = true)
+    fun findMyByProblemId(problemId: Long, userId: UUID, page: Int, size: Int): PageResponse<SubmissionResponse> {
+        val submissions = submissionRepository.findByProblemIdAndUserId(problemId, userId, page, size)
+        val totalElements = submissionRepository.countByProblemIdAndUserId(problemId, userId)
+        return PageResponse.of(
+            content = submissions.map { SubmissionResponse.from(it) },
+            page = page,
+            size = size,
+            totalElements = totalElements
+        )
+    }
+
+    @Transactional(readOnly = true)
+    fun findById(problemId: Long, submissionId: Long): SubmissionResponse {
+        val submission = submissionRepository.findById(submissionId)
+            ?: throw BusinessException(SubmissionErrorCode.SUBMISSION_NOT_FOUND)
+        if (submission.problemId != problemId) {
+            throw BusinessException(SubmissionErrorCode.SUBMISSION_NOT_FOUND)
+        }
+        return SubmissionResponse.from(submission)
+    }
+}

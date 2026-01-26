@@ -1,6 +1,5 @@
-package me.suhyun.soj.domain.submission.domain
+package me.suhyun.soj.domain.submission.domain.entity
 
-import me.suhyun.soj.domain.problem.domain.entity.ProblemEntity
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -8,7 +7,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 class SubmissionEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<SubmissionEntity>(SubmissionTable)
 
-    var problem by ProblemEntity referencedOn SubmissionTable.problemId
+    var problemId by SubmissionTable.problemId
     var userId by SubmissionTable.userId
     var query by SubmissionTable.query
     var status by SubmissionTable.status

@@ -1,4 +1,4 @@
-package me.suhyun.soj.domain.submission.domain.enums
+package me.suhyun.soj.domain.submission.domain.model.enums
 
 enum class SubmissionVerdict {
     ACCEPTED,
