@@ -1,6 +1,5 @@
-package me.suhyun.soj.domain.testcase.domain
+package me.suhyun.soj.domain.testcase.domain.entity
 
-import me.suhyun.soj.domain.problem.domain.entity.ProblemEntity
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -8,7 +7,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 class TestCaseEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<TestCaseEntity>(TestCaseTable)
 
-    var problem by ProblemEntity referencedOn TestCaseTable.problemId
+    var problemId by TestCaseTable.problemId
     var initSql by TestCaseTable.initSql
     var answer by TestCaseTable.answer
     var createdAt by TestCaseTable.createdAt
