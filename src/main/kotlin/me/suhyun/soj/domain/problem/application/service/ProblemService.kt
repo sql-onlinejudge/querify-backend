@@ -8,6 +8,7 @@ import me.suhyun.soj.domain.problem.presentation.request.CreateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.request.UpdateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.response.ProblemDetailResponse
 import me.suhyun.soj.domain.problem.presentation.response.ProblemResponse
+import me.suhyun.soj.domain.submission.domain.entity.SubmissionTable.userId
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
 import me.suhyun.soj.domain.testcase.domain.model.TestCase
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
@@ -91,10 +92,11 @@ class ProblemService(
     }
 
     @Transactional(readOnly = true)
-    fun findById(problemId: Long): ProblemDetailResponse {
+    fun findById(problemId: Long, userId: UUID?): ProblemDetailResponse {
         val problem = problemRepository.findById(problemId)
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
-        return ProblemDetailResponse.from(problem)
+        val trialStatus = getTrialStatus(problemId, userId)
+        return ProblemDetailResponse.from(problem, trialStatus)
     }
 
     fun update(problemId: Long, request: UpdateProblemRequest) {
@@ -126,5 +128,9 @@ class ProblemService(
                 else -> TrialStatus.ATTEMPTED
             }
         }
+    }
+
+    private fun getTrialStatus(problemId: Long, userId: UUID?): TrialStatus {
+        return submissionRepository.getTrialStatus(problemId, userId)
     }
 }

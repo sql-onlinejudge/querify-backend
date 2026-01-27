@@ -1,6 +1,7 @@
 package me.suhyun.soj.domain.problem.presentation.response
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import java.time.LocalDateTime
 
 data class ProblemDetailResponse(
@@ -13,11 +14,12 @@ data class ProblemDetailResponse(
     val isOrderSensitive: Boolean,
     val solvedCount: Int,
     val submissionCount: Int,
+    val trialStatus: TrialStatus?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(problem: Problem): ProblemDetailResponse {
+        fun from(problem: Problem, trialStatus: TrialStatus? = null): ProblemDetailResponse {
             return ProblemDetailResponse(
                 id = problem.id!!,
                 title = problem.title,
@@ -28,6 +30,7 @@ data class ProblemDetailResponse(
                 isOrderSensitive = problem.isOrderSensitive,
                 solvedCount = problem.solvedCount,
                 submissionCount = problem.submissionCount,
+                trialStatus = trialStatus,
                 createdAt = problem.createdAt,
                 updatedAt = problem.updatedAt
             )
