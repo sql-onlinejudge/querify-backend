@@ -88,7 +88,9 @@ class SubmissionRepositoryImpl : SubmissionRepository {
             .mapValues { (_, subs) -> subs.any { it.verdict == SubmissionVerdict.ACCEPTED } }
     }
 
-    override fun getTrialStatus(problemId: Long, userId: UUID): TrialStatus {
+    override fun getTrialStatus(problemId: Long, userId: UUID?): TrialStatus {
+        if (userId == null) return TrialStatus.NOT_ATTEMPTED
+
         val submissions = SubmissionTable.selectAll()
             .andWhere { SubmissionTable.deletedAt.isNull() }
             .andWhere { SubmissionTable.problemId eq problemId }
