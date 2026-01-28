@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.submission.presentation
 import jakarta.validation.Valid
 import me.suhyun.soj.domain.submission.application.service.SubmissionService
 import me.suhyun.soj.domain.submission.presentation.request.SubmitRequest
+import me.suhyun.soj.domain.submission.presentation.response.SubmissionDetailResponse
 import me.suhyun.soj.domain.submission.presentation.response.SubmissionResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import org.springframework.http.HttpStatus
@@ -46,7 +47,7 @@ class SubmissionController(
     fun findById(
         @PathVariable problemId: Long,
         @PathVariable submissionId: Long
-    ): SubmissionResponse {
+    ): SubmissionDetailResponse {
         return submissionService.findById(problemId, submissionId)
     }
 }

@@ -19,11 +19,11 @@ class SubmissionRepositoryImpl : SubmissionRepository {
     override fun save(submission: Submission): Submission {
         val entity = SubmissionEntity.new {
             this.problemId = submission.problemId
-            this.userId = submission.userId
+            this.userId = submission.userId.toString()
             this.query = submission.query
             this.status = submission.status
             this.verdict = submission.verdict
-            this.createdAt = LocalDateTime.now()
+            this.createdAt = submission.createdAt
         }
         return Submission.from(entity)
     }
@@ -53,7 +53,7 @@ class SubmissionRepositoryImpl : SubmissionRepository {
         return SubmissionTable.selectAll()
             .andWhere { SubmissionTable.deletedAt.isNull() }
             .andWhere { SubmissionTable.problemId eq problemId }
-            .andWhere { SubmissionTable.userId eq userId }
+            .andWhere { SubmissionTable.userId eq userId.toString() }
             .orderBy(SubmissionTable.createdAt, SortOrder.DESC)
             .limit(size, (page * size).toLong())
             .map { SubmissionEntity.wrapRow(it) }
@@ -71,7 +71,7 @@ class SubmissionRepositoryImpl : SubmissionRepository {
         return SubmissionTable.selectAll()
             .andWhere { SubmissionTable.deletedAt.isNull() }
             .andWhere { SubmissionTable.problemId eq problemId }
-            .andWhere { SubmissionTable.userId eq userId }
+            .andWhere { SubmissionTable.userId eq userId.toString() }
             .count()
     }
 
@@ -81,7 +81,7 @@ class SubmissionRepositoryImpl : SubmissionRepository {
         val submissions = SubmissionTable.selectAll()
             .andWhere { SubmissionTable.deletedAt.isNull() }
             .andWhere { SubmissionTable.problemId inList problemIds }
-            .andWhere { SubmissionTable.userId eq userId }
+            .andWhere { SubmissionTable.userId eq userId.toString() }
             .map { SubmissionEntity.wrapRow(it) }
 
         return submissions.groupBy { it.problemId }
@@ -94,7 +94,7 @@ class SubmissionRepositoryImpl : SubmissionRepository {
         val submissions = SubmissionTable.selectAll()
             .andWhere { SubmissionTable.deletedAt.isNull() }
             .andWhere { SubmissionTable.problemId eq problemId }
-            .andWhere { SubmissionTable.userId eq userId }
+            .andWhere { SubmissionTable.userId eq userId.toString() }
             .map { SubmissionEntity.wrapRow(it) }
 
         if (submissions.isEmpty()) return TrialStatus.NOT_ATTEMPTED

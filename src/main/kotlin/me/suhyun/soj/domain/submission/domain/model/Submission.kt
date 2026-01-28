@@ -21,7 +21,7 @@ data class Submission(
         fun from(entity: SubmissionEntity) = Submission(
             id = entity.id.value,
             problemId = entity.problemId,
-            userId = entity.userId,
+            userId = UUID.fromString(entity.userId),
             query = entity.query,
             status = entity.status,
             verdict = entity.verdict,

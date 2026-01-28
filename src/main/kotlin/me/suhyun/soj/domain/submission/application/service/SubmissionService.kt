@@ -1,11 +1,13 @@
 package me.suhyun.soj.domain.submission.application.service
 
 import me.suhyun.soj.domain.grading.application.event.SubmissionCreatedEvent
+import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionStatus
 import me.suhyun.soj.domain.submission.domain.model.Submission
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
 import me.suhyun.soj.domain.submission.exception.SubmissionErrorCode
 import me.suhyun.soj.domain.submission.presentation.request.SubmitRequest
+import me.suhyun.soj.domain.submission.presentation.response.SubmissionDetailResponse
 import me.suhyun.soj.domain.submission.presentation.response.SubmissionResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import me.suhyun.soj.global.exception.BusinessException
@@ -19,6 +21,7 @@ import java.util.UUID
 @Transactional
 class SubmissionService(
     private val submissionRepository: SubmissionRepository,
+    private val problemRepository: ProblemRepository,
     private val eventPublisher: ApplicationEventPublisher
 ) {
 
@@ -37,6 +40,7 @@ class SubmissionService(
             )
         )
 
+        problemRepository.incrementSubmittedCount(problemId)
         eventPublisher.publishEvent(SubmissionCreatedEvent(saved.id!!))
 
         return saved.id
@@ -67,12 +71,12 @@ class SubmissionService(
     }
 
     @Transactional(readOnly = true)
-    fun findById(problemId: Long, submissionId: Long): SubmissionResponse {
+    fun findById(problemId: Long, submissionId: Long): SubmissionDetailResponse {
         val submission = submissionRepository.findById(submissionId)
             ?: throw BusinessException(SubmissionErrorCode.SUBMISSION_NOT_FOUND)
         if (submission.problemId != problemId) {
             throw BusinessException(SubmissionErrorCode.SUBMISSION_NOT_FOUND)
         }
-        return SubmissionResponse.from(submission)
+        return SubmissionDetailResponse.from(submission)
     }
 }
