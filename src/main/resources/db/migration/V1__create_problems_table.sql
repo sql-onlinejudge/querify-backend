@@ -9,8 +9,7 @@ CREATE TABLE problems (
     solved_count INT NOT NULL DEFAULT 0,
     submitted_count INT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    updated_at DATETIME,
     deleted_at DATETIME,
-    INDEX idx_difficulty (difficulty),
-    INDEX idx_deleted_at (deleted_at)
+    INDEX idx_difficulty (difficulty)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
