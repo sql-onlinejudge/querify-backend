@@ -8,12 +8,12 @@ interface ProblemRepository {
     fun findAll(
         page: Int,
         size: Int,
-        difficulty: Int?,
+        minDifficulty: Int?,
+        maxDifficulty: Int?,
         keyword: String?,
-        sortBy: String,
-        sortDirection: String
+        sort: List<String>
     ): List<Problem>
-    fun countAll(difficulty: Int?, keyword: String?): Long
+    fun countAll(minDifficulty: Int?, maxDifficulty: Int?, keyword: String?): Long
     fun update(
         id: Long,
         title: String?,
@@ -24,4 +24,6 @@ interface ProblemRepository {
         isOrderSensitive: Boolean?
     ): Problem?
     fun softDelete(id: Long): Boolean
+    fun incrementSubmittedCount(id: Long)
+    fun incrementSolvedCount(id: Long)
 }

@@ -39,19 +39,19 @@ class ProblemController(
     fun findAll(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @RequestParam(required = false) difficulty: Int?,
+        @RequestParam(required = false) minDifficulty: Int?,
+        @RequestParam(required = false) maxDifficulty: Int?,
         @RequestParam(required = false) keyword: String?,
-        @RequestParam(defaultValue = "id") sortBy: String,
-        @RequestParam(defaultValue = "DESC") sortDirection: String,
+        @RequestParam(defaultValue = "id:desc") sort: List<String>,
         @RequestHeader("X-User-Id") userId: String,
     ): PageResponse<ProblemResponse> {
         return problemService.findAll(
             page = page,
             size = size,
-            difficulty = difficulty,
+            minDifficulty = minDifficulty,
+            maxDifficulty = maxDifficulty,
             keyword = keyword,
-            sortBy = sortBy,
-            sortDirection = sortDirection,
+            sort = sort,
             userId = UUID.fromString(userId)
         )
     }

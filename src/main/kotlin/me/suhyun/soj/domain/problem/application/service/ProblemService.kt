@@ -64,21 +64,21 @@ class ProblemService(
     fun findAll(
         page: Int,
         size: Int,
-        difficulty: Int?,
+        minDifficulty: Int?,
+        maxDifficulty: Int?,
         keyword: String?,
-        sortBy: String,
-        sortDirection: String,
+        sort: List<String>,
         userId: UUID
     ): PageResponse<ProblemResponse> {
         val problems = problemRepository.findAll(
             page = page,
             size = size,
-            difficulty = difficulty,
+            minDifficulty = minDifficulty,
+            maxDifficulty = maxDifficulty,
             keyword = keyword,
-            sortBy = sortBy,
-            sortDirection = sortDirection
+            sort = sort
         )
-        val totalElements = problemRepository.countAll(difficulty, keyword)
+        val totalElements = problemRepository.countAll(minDifficulty, maxDifficulty, keyword)
 
         val problemIds = problems.mapNotNull { it.id }
         val trialStatuses = getTrialStatuses(problemIds, userId)
