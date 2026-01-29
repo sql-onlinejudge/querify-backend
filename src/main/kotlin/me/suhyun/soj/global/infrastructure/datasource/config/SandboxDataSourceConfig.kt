@@ -1,4 +1,4 @@
-package me.suhyun.soj.global.config
+package me.suhyun.soj.global.infrastructure.datasource.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.jdbc.DataSourceBuilder
