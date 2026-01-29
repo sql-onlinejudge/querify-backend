@@ -41,7 +41,7 @@ class SubmissionService(
         )
 
         problemRepository.incrementSubmittedCount(problemId)
-        eventPublisher.publishEvent(SubmissionCreatedEvent(saved.id!!))
+        eventPublisher.publishEvent(SubmissionCreatedEvent(saved.id!!, saved.query))
 
         return saved.id
     }

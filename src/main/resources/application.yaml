@@ -59,3 +59,8 @@ logging:
     root: INFO
     me.suhyun.soj: DEBUG
     org.jetbrains.exposed: DEBUG
+
+notification:
+  discord:
+    enabled: true
+    webhook-url: ${DISCORD_WEBHOOK_URL}

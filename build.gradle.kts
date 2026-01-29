@@ -71,6 +71,12 @@ dependencies {
 
     // 로그
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
+
+    // WebClient
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    // Firebase Admin (FCM)
+    implementation("com.google.firebase:firebase-admin:9.2.0")
 }
 
 kotlin {
