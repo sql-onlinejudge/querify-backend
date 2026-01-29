@@ -63,7 +63,9 @@ logging:
 notification:
   routing:
     submission: ${NOTIFICATION_ROUTING_SUBMISSION:discord}
+    error: ${NOTIFICATION_ROUTING_ERROR:discord}
   discord:
     webhook-url: ${DISCORD_WEBHOOK_URL:}
+    error-webhook-url: ${DISCORD_ERROR_WEBHOOK_URL:}
   slack:
     webhook-url: ${SLACK_WEBHOOK_URL:}

@@ -2,7 +2,8 @@ package me.suhyun.soj.global.infrastructure.notification.model.enums
 
 enum class NotificationType(
     val title: String,
-    val template: String
+    val color: Int
 ) {
-    SUBMISSION("📝 쿼리 제출", "제출 아이디: %s\n쿼리: ```%s```"),
+    SUBMISSION("📝 쿼리 제출", 3447003),
+    ERROR("🚨 Error Occurred", 16711680),
 }

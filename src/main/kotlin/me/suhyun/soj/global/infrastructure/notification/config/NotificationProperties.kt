@@ -9,7 +9,8 @@ data class NotificationProperties(
     val slack: SlackProperties = SlackProperties(),
 ) {
     data class DiscordProperties(
-        val webhookUrl: String = ""
+        val webhookUrl: String = "",
+        val errorWebhookUrl: String = ""
     )
 
     data class SlackProperties(
