@@ -38,6 +38,7 @@ sentry:
   dsn: ${SENTRY_DSN:}
   environment: ${SPRING_PROFILES_ACTIVE:local}
   traces-sample-rate: 1.0
+  send-default-pii: true
 
 # Actuator
 management:
