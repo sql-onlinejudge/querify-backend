@@ -1,6 +1,33 @@
 # docker-compose.yml
 
 services:
+  app:
+    image: ${APP_IMAGE:-soj-backend:latest}
+    container_name: soj-app
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-soj}
+      MYSQL_USERNAME: ${MYSQL_USERNAME:-soj}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-soj123}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SANDBOX_MYSQL_HOST: mysql-sandbox
+      SANDBOX_MYSQL_PORT: 3306
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mysql-sandbox:
+        condition: service_healthy
+
   mysql:
     image: mysql:8.0
     container_name: soj-mysql
