@@ -2,6 +2,8 @@ package me.suhyun.soj.domain.testcase.domain.repository
 
 import me.suhyun.soj.domain.testcase.domain.entity.TestCaseEntity
 import me.suhyun.soj.domain.testcase.domain.entity.TestCaseTable
+import me.suhyun.soj.domain.testcase.domain.model.AnswerMetadata
+import me.suhyun.soj.domain.testcase.domain.model.InitMetadata
 import me.suhyun.soj.domain.testcase.domain.model.TestCase
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.selectAll
@@ -15,7 +17,9 @@ class TestCaseRepositoryImpl : TestCaseRepository {
         val entity = TestCaseEntity.new {
             this.problemId = testCase.problemId
             this.initSql = testCase.initSql
+            this.initMetadata = testCase.initMetadata
             this.answer = testCase.answer
+            this.answerMetadata = testCase.answerMetadata
             this.createdAt = LocalDateTime.now()
         }
         return TestCase.from(entity)
@@ -35,13 +39,25 @@ class TestCaseRepositoryImpl : TestCaseRepository {
             .map { TestCase.from(it) }
     }
 
-    override fun update(id: Long, initSql: String?, answer: String?): TestCase? {
+    override fun update(
+        id: Long,
+        initSql: String?,
+        initMetadata: InitMetadata?,
+        answer: String?,
+        answerMetadata: AnswerMetadata?
+    ): TestCase? {
         val entity = TestCaseEntity.findById(id)
             ?.takeIf { it.deletedAt == null }
             ?: return null
 
-        initSql?.let { entity.initSql = it }
-        answer?.let { entity.answer = it }
+        initSql?.let {
+            entity.initSql = it
+            entity.initMetadata = initMetadata
+        }
+        answer?.let {
+            entity.answer = it
+            entity.answerMetadata = answerMetadata
+        }
         entity.updatedAt = LocalDateTime.now()
 
         return TestCase.from(entity)

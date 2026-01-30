@@ -8,6 +8,7 @@ import me.suhyun.soj.domain.testcase.exception.TestCaseErrorCode
 import me.suhyun.soj.domain.testcase.presentation.request.CreateTestCaseRequest
 import me.suhyun.soj.domain.testcase.presentation.request.UpdateTestCaseRequest
 import me.suhyun.soj.domain.testcase.presentation.response.TestCaseResponse
+import me.suhyun.soj.global.common.util.SqlGenerator
 import me.suhyun.soj.global.exception.BusinessException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,19 +18,23 @@ import java.time.LocalDateTime
 @Transactional
 class TestCaseService(
     private val testCaseRepository: TestCaseRepository,
-    private val problemRepository: ProblemRepository,
+    private val problemRepository: ProblemRepository
 ) {
 
     fun create(problemId: Long, request: CreateTestCaseRequest) {
         val problem = problemRepository.findById(problemId)
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
 
+        val initSql = request.initData?.let { SqlGenerator.generateInit(it) }
+        val answer = SqlGenerator.generateAnswer(request.answerData)
         testCaseRepository.save(
             TestCase(
                 id = null,
                 problemId = problem.id!!,
-                initSql = request.initSql,
-                answer = request.answer,
+                initSql = initSql,
+                initMetadata = request.initData,
+                answer = answer,
+                answerMetadata = request.answerData,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null
@@ -59,7 +64,9 @@ class TestCaseService(
         if (testCase.problemId != problemId) {
             throw BusinessException(TestCaseErrorCode.TEST_CASE_NOT_FOUND)
         }
-        testCaseRepository.update(testcaseId, request.initSql, request.answer)
+        val initSql = request.initData?.let { SqlGenerator.generateInit(it) }
+        val answer = request.answerData?.let { SqlGenerator.generateAnswer(it) }
+        testCaseRepository.update(testcaseId, initSql, request.initData, answer, request.answerData)
     }
 
     fun delete(problemId: Long, testcaseId: Long) {

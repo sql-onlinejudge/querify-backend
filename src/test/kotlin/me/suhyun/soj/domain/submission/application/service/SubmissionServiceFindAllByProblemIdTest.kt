@@ -22,13 +22,16 @@ class SubmissionServiceFindAllByProblemIdTest {
     private lateinit var submissionRepository: SubmissionRepository
 
     @Mock
+    private lateinit var problemRepository: me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
+
+    @Mock
     private lateinit var eventPublisher: ApplicationEventPublisher
 
     private lateinit var submissionService: SubmissionService
 
     @BeforeEach
     fun setUp() {
-        submissionService = SubmissionService(submissionRepository, eventPublisher)
+        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher)
     }
 
     private fun createSubmission(

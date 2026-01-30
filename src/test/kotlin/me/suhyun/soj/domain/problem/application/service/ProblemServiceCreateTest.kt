@@ -1,9 +1,15 @@
 package me.suhyun.soj.domain.problem.application.service
 
+import me.suhyun.soj.domain.problem.domain.model.ColumnMetadata
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
+import me.suhyun.soj.domain.problem.domain.model.TableMetadata
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.presentation.request.CreateProblemRequest
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
+import me.suhyun.soj.domain.testcase.domain.model.AnswerMetadata
+import me.suhyun.soj.domain.testcase.domain.model.InitMetadata
+import me.suhyun.soj.domain.testcase.domain.model.InsertStatement
 import me.suhyun.soj.domain.testcase.domain.model.TestCase
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.domain.testcase.presentation.request.CreateTestCaseRequest
@@ -32,6 +38,26 @@ class ProblemServiceCreateTest {
 
     private lateinit var problemService: ProblemService
 
+    private val testSchemaMetadata = SchemaMetadata(
+        tables = listOf(
+            TableMetadata(
+                name = "test",
+                columns = listOf(ColumnMetadata(name = "id", type = "INT", constraints = emptyList()))
+            )
+        )
+    )
+
+    private val testInitData = InitMetadata(
+        statements = listOf(
+            InsertStatement(table = "test", rows = listOf(mapOf("id" to 1)))
+        )
+    )
+
+    private val testAnswerData = AnswerMetadata(
+        columns = listOf("id"),
+        rows = listOf(listOf(1))
+    )
+
     @BeforeEach
     fun setUp() {
         problemService = ProblemService(problemRepository, testCaseRepository, submissionRepository)
@@ -42,12 +68,12 @@ class ProblemServiceCreateTest {
         val request = CreateProblemRequest(
             title = "Test Problem",
             description = "Test Description",
-            schemaSql = "CREATE TABLE test (id INT)",
+            schemaMetadata = testSchemaMetadata,
             difficulty = 3,
             timeLimit = 1000,
             isOrderSensitive = false,
             testcases = listOf(
-                CreateTestCaseRequest(initSql = "INSERT INTO test VALUES (1)", answer = "1")
+                CreateTestCaseRequest(initData = testInitData, answerData = testAnswerData)
             )
         )
 
@@ -55,7 +81,8 @@ class ProblemServiceCreateTest {
             id = 1L,
             title = request.title,
             description = request.description,
-            schemaSql = request.schemaSql,
+            schemaSql = "CREATE TABLE test (id INT);",
+            schemaMetadata = request.schemaMetadata,
             difficulty = request.difficulty,
             timeLimit = request.timeLimit,
             isOrderSensitive = request.isOrderSensitive,
@@ -71,8 +98,10 @@ class ProblemServiceCreateTest {
             TestCase(
                 id = 1L,
                 problemId = 1L,
-                initSql = "INSERT INTO test VALUES (1)",
-                answer = "1",
+                initSql = "INSERT INTO test (id) VALUES (1);",
+                initMetadata = testInitData,
+                answer = "id\n1",
+                answerMetadata = testAnswerData,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null
@@ -88,15 +117,15 @@ class ProblemServiceCreateTest {
     @Test
     fun `should save all testcases when creating problem`() {
         val testcases = listOf(
-            CreateTestCaseRequest(initSql = "INSERT INTO test VALUES (1)", answer = "1"),
-            CreateTestCaseRequest(initSql = "INSERT INTO test VALUES (2)", answer = "2"),
-            CreateTestCaseRequest(initSql = null, answer = "3")
+            CreateTestCaseRequest(initData = testInitData, answerData = testAnswerData),
+            CreateTestCaseRequest(initData = testInitData, answerData = testAnswerData),
+            CreateTestCaseRequest(initData = null, answerData = testAnswerData)
         )
 
         val request = CreateProblemRequest(
             title = "Test Problem",
             description = "Test Description",
-            schemaSql = "CREATE TABLE test (id INT)",
+            schemaMetadata = testSchemaMetadata,
             difficulty = 2,
             timeLimit = 500,
             isOrderSensitive = true,
@@ -107,7 +136,8 @@ class ProblemServiceCreateTest {
             id = 1L,
             title = request.title,
             description = request.description,
-            schemaSql = request.schemaSql,
+            schemaSql = "CREATE TABLE test (id INT);",
+            schemaMetadata = request.schemaMetadata,
             difficulty = request.difficulty,
             timeLimit = request.timeLimit,
             isOrderSensitive = request.isOrderSensitive,
@@ -124,7 +154,9 @@ class ProblemServiceCreateTest {
                 id = 1L,
                 problemId = 1L,
                 initSql = null,
-                answer = "1",
+                initMetadata = null,
+                answer = "id\n1",
+                answerMetadata = testAnswerData,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null

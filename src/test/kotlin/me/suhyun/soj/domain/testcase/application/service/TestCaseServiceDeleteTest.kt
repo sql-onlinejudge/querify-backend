@@ -36,7 +36,9 @@ class TestCaseServiceDeleteTest {
             id = id,
             problemId = problemId,
             initSql = "INSERT INTO test VALUES (1)",
+            initMetadata = null,
             answer = "1",
+            answerMetadata = null,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null

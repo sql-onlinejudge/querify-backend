@@ -39,7 +39,9 @@ class TestCaseServiceFindByIdTest {
             id = testcaseId,
             problemId = problemId,
             initSql = "INSERT INTO test VALUES (1)",
+            initMetadata = null,
             answer = "1",
+            answerMetadata = null,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null
@@ -77,7 +79,9 @@ class TestCaseServiceFindByIdTest {
             id = testcaseId,
             problemId = differentProblemId,
             initSql = "INSERT INTO test VALUES (1)",
+            initMetadata = null,
             answer = "1",
+            answerMetadata = null,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null

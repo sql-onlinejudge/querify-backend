@@ -80,6 +80,9 @@ dependencies {
     // 로그
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
+    // SQL Parser
+    implementation("com.github.jsqlparser:jsqlparser:5.0")
+
     // WebClient
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 }

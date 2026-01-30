@@ -42,6 +42,7 @@ class ProblemServiceFindAllTest {
             title = title,
             description = "Description",
             schemaSql = "CREATE TABLE test (id INT)",
+            schemaMetadata = null,
             difficulty = difficulty,
             timeLimit = 1000,
             isOrderSensitive = false,
@@ -56,12 +57,13 @@ class ProblemServiceFindAllTest {
     @Test
     fun `should return paginated problems`() {
         val problems = listOf(createProblem(1L), createProblem(2L))
+        val sort = listOf("createdAt:desc")
 
-        whenever(problemRepository.findAll(0, 10, null, null, "createdAt", "desc")).thenReturn(problems)
-        whenever(problemRepository.countAll(null, null)).thenReturn(2L)
+        whenever(problemRepository.findAll(0, 10, null, null, null, sort)).thenReturn(problems)
+        whenever(problemRepository.countAll(null, null, null)).thenReturn(2L)
         whenever(submissionRepository.getTrialStatuses(listOf(1L, 2L), userId)).thenReturn(emptyMap())
 
-        val result = problemService.findAll(0, 10, null, null, "createdAt", "desc", userId)
+        val result = problemService.findAll(0, 10, null, null, null, sort, userId)
 
         assertThat(result.content).hasSize(2)
         assertThat(result.totalElements).isEqualTo(2L)
@@ -72,12 +74,13 @@ class ProblemServiceFindAllTest {
     @Test
     fun `should filter by keyword`() {
         val problems = listOf(createProblem(1L, "SQL Basics"))
+        val sort = listOf("createdAt:desc")
 
-        whenever(problemRepository.findAll(0, 10, null, "SQL", "createdAt", "desc")).thenReturn(problems)
-        whenever(problemRepository.countAll(null, "SQL")).thenReturn(1L)
+        whenever(problemRepository.findAll(0, 10, null, null, "SQL", sort)).thenReturn(problems)
+        whenever(problemRepository.countAll(null, null, "SQL")).thenReturn(1L)
         whenever(submissionRepository.getTrialStatuses(listOf(1L), userId)).thenReturn(emptyMap())
 
-        val result = problemService.findAll(0, 10, null, "SQL", "createdAt", "desc", userId)
+        val result = problemService.findAll(0, 10, null, null, "SQL", sort, userId)
 
         assertThat(result.content).hasSize(1)
         assertThat(result.content[0].title).isEqualTo("SQL Basics")
@@ -86,12 +89,13 @@ class ProblemServiceFindAllTest {
     @Test
     fun `should filter by difficulty`() {
         val problems = listOf(createProblem(1L, difficulty = 5))
+        val sort = listOf("createdAt:desc")
 
-        whenever(problemRepository.findAll(0, 10, 5, null, "createdAt", "desc")).thenReturn(problems)
-        whenever(problemRepository.countAll(5, null)).thenReturn(1L)
+        whenever(problemRepository.findAll(0, 10, 5, null, null, sort)).thenReturn(problems)
+        whenever(problemRepository.countAll(5, null, null)).thenReturn(1L)
         whenever(submissionRepository.getTrialStatuses(listOf(1L), userId)).thenReturn(emptyMap())
 
-        val result = problemService.findAll(0, 10, 5, null, "createdAt", "desc", userId)
+        val result = problemService.findAll(0, 10, 5, null, null, sort, userId)
 
         assertThat(result.content).hasSize(1)
         assertThat(result.content[0].difficulty).isEqualTo(5)
@@ -100,12 +104,13 @@ class ProblemServiceFindAllTest {
     @Test
     fun `should calculate trial status NOT_ATTEMPTED`() {
         val problems = listOf(createProblem(1L))
+        val sort = listOf("createdAt:desc")
 
-        whenever(problemRepository.findAll(0, 10, null, null, "createdAt", "desc")).thenReturn(problems)
-        whenever(problemRepository.countAll(null, null)).thenReturn(1L)
+        whenever(problemRepository.findAll(0, 10, null, null, null, sort)).thenReturn(problems)
+        whenever(problemRepository.countAll(null, null, null)).thenReturn(1L)
         whenever(submissionRepository.getTrialStatuses(listOf(1L), userId)).thenReturn(emptyMap())
 
-        val result = problemService.findAll(0, 10, null, null, "createdAt", "desc", userId)
+        val result = problemService.findAll(0, 10, null, null, null, sort, userId)
 
         assertThat(result.content[0].trialStatus).isEqualTo(TrialStatus.NOT_ATTEMPTED)
     }
@@ -113,12 +118,13 @@ class ProblemServiceFindAllTest {
     @Test
     fun `should calculate trial status ATTEMPTED`() {
         val problems = listOf(createProblem(1L))
+        val sort = listOf("createdAt:desc")
 
-        whenever(problemRepository.findAll(0, 10, null, null, "createdAt", "desc")).thenReturn(problems)
-        whenever(problemRepository.countAll(null, null)).thenReturn(1L)
+        whenever(problemRepository.findAll(0, 10, null, null, null, sort)).thenReturn(problems)
+        whenever(problemRepository.countAll(null, null, null)).thenReturn(1L)
         whenever(submissionRepository.getTrialStatuses(listOf(1L), userId)).thenReturn(mapOf(1L to false))
 
-        val result = problemService.findAll(0, 10, null, null, "createdAt", "desc", userId)
+        val result = problemService.findAll(0, 10, null, null, null, sort, userId)
 
         assertThat(result.content[0].trialStatus).isEqualTo(TrialStatus.ATTEMPTED)
     }
@@ -126,22 +132,25 @@ class ProblemServiceFindAllTest {
     @Test
     fun `should calculate trial status SOLVED`() {
         val problems = listOf(createProblem(1L))
+        val sort = listOf("createdAt:desc")
 
-        whenever(problemRepository.findAll(0, 10, null, null, "createdAt", "desc")).thenReturn(problems)
-        whenever(problemRepository.countAll(null, null)).thenReturn(1L)
+        whenever(problemRepository.findAll(0, 10, null, null, null, sort)).thenReturn(problems)
+        whenever(problemRepository.countAll(null, null, null)).thenReturn(1L)
         whenever(submissionRepository.getTrialStatuses(listOf(1L), userId)).thenReturn(mapOf(1L to true))
 
-        val result = problemService.findAll(0, 10, null, null, "createdAt", "desc", userId)
+        val result = problemService.findAll(0, 10, null, null, null, sort, userId)
 
         assertThat(result.content[0].trialStatus).isEqualTo(TrialStatus.SOLVED)
     }
 
     @Test
     fun `should return empty content when no problems exist`() {
-        whenever(problemRepository.findAll(0, 10, null, null, "createdAt", "desc")).thenReturn(emptyList())
-        whenever(problemRepository.countAll(null, null)).thenReturn(0L)
+        val sort = listOf("createdAt:desc")
 
-        val result = problemService.findAll(0, 10, null, null, "createdAt", "desc", userId)
+        whenever(problemRepository.findAll(0, 10, null, null, null, sort)).thenReturn(emptyList())
+        whenever(problemRepository.countAll(null, null, null)).thenReturn(0L)
+
+        val result = problemService.findAll(0, 10, null, null, null, sort, userId)
 
         assertThat(result.content).isEmpty()
         assertThat(result.totalElements).isEqualTo(0L)

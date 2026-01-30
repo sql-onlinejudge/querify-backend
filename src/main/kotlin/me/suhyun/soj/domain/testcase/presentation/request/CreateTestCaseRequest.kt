@@ -1,10 +1,12 @@
 package me.suhyun.soj.domain.testcase.presentation.request
 
-import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import me.suhyun.soj.domain.testcase.domain.model.AnswerMetadata
+import me.suhyun.soj.domain.testcase.domain.model.InitMetadata
 
 data class CreateTestCaseRequest(
-    val initSql: String?,
+    val initData: InitMetadata?,
 
-    @field:NotBlank
-    val answer: String
+    @field:NotNull
+    val answerData: AnswerMetadata
 )
