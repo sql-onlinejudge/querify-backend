@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.problem.domain.repository
 import me.suhyun.soj.domain.problem.domain.entity.ProblemEntity
 import me.suhyun.soj.domain.problem.domain.entity.ProblemTable
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
@@ -21,6 +22,7 @@ class ProblemRepositoryImpl : ProblemRepository {
             this.title = problem.title
             this.description = problem.description
             this.schemaSql = problem.schemaSql
+            this.schemaMetadata = problem.schemaMetadata
             this.difficulty = problem.difficulty
             this.timeLimit = problem.timeLimit
             this.isOrderSensitive = problem.isOrderSensitive
@@ -85,6 +87,7 @@ class ProblemRepositoryImpl : ProblemRepository {
         title: String?,
         description: String?,
         schemaSql: String?,
+        schemaMetadata: SchemaMetadata?,
         difficulty: Int?,
         timeLimit: Int?,
         isOrderSensitive: Boolean?
@@ -95,7 +98,10 @@ class ProblemRepositoryImpl : ProblemRepository {
 
         title?.let { entity.title = it }
         description?.let { entity.description = it }
-        schemaSql?.let { entity.schemaSql = it }
+        schemaSql?.let {
+            entity.schemaSql = it
+            entity.schemaMetadata = schemaMetadata
+        }
         difficulty?.let { entity.difficulty = it }
         timeLimit?.let { entity.timeLimit = it }
         isOrderSensitive?.let { entity.isOrderSensitive = it }

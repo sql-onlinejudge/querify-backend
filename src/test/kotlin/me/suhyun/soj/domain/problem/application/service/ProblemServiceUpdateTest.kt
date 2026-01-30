@@ -1,6 +1,9 @@
 package me.suhyun.soj.domain.problem.application.service
 
+import me.suhyun.soj.domain.problem.domain.model.ColumnMetadata
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
+import me.suhyun.soj.domain.problem.domain.model.TableMetadata
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
 import me.suhyun.soj.domain.problem.presentation.request.UpdateProblemRequest
@@ -13,6 +16,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -31,6 +36,15 @@ class ProblemServiceUpdateTest {
 
     private lateinit var problemService: ProblemService
 
+    private val testSchemaMetadata = SchemaMetadata(
+        tables = listOf(
+            TableMetadata(
+                name = "updated",
+                columns = listOf(ColumnMetadata(name = "id", type = "INT", constraints = emptyList()))
+            )
+        )
+    )
+
     @BeforeEach
     fun setUp() {
         problemService = ProblemService(problemRepository, testCaseRepository, submissionRepository)
@@ -41,7 +55,7 @@ class ProblemServiceUpdateTest {
         val request = UpdateProblemRequest(
             title = "Updated Title",
             description = "Updated Description",
-            schemaSql = "CREATE TABLE updated (id INT)",
+            schemaMetadata = testSchemaMetadata,
             difficulty = 5,
             timeLimit = 2000,
             isOrderSensitive = true
@@ -51,7 +65,8 @@ class ProblemServiceUpdateTest {
             id = 1L,
             title = "Updated Title",
             description = "Updated Description",
-            schemaSql = "CREATE TABLE updated (id INT)",
+            schemaSql = "CREATE TABLE updated (id INT);",
+            schemaMetadata = testSchemaMetadata,
             difficulty = 5,
             timeLimit = 2000,
             isOrderSensitive = true,
@@ -64,26 +79,28 @@ class ProblemServiceUpdateTest {
 
         whenever(
             problemRepository.update(
-                id = 1L,
-                title = request.title,
-                description = request.description,
-                schemaSql = request.schemaSql,
-                difficulty = request.difficulty,
-                timeLimit = request.timeLimit,
-                isOrderSensitive = request.isOrderSensitive
+                id = eq(1L),
+                title = eq(request.title),
+                description = eq(request.description),
+                schemaSql = any(),
+                schemaMetadata = eq(request.schemaMetadata),
+                difficulty = eq(request.difficulty),
+                timeLimit = eq(request.timeLimit),
+                isOrderSensitive = eq(request.isOrderSensitive)
             )
         ).thenReturn(updatedProblem)
 
         problemService.update(1L, request)
 
         verify(problemRepository).update(
-            id = 1L,
-            title = request.title,
-            description = request.description,
-            schemaSql = request.schemaSql,
-            difficulty = request.difficulty,
-            timeLimit = request.timeLimit,
-            isOrderSensitive = request.isOrderSensitive
+            id = eq(1L),
+            title = eq(request.title),
+            description = eq(request.description),
+            schemaSql = any(),
+            schemaMetadata = eq(request.schemaMetadata),
+            difficulty = eq(request.difficulty),
+            timeLimit = eq(request.timeLimit),
+            isOrderSensitive = eq(request.isOrderSensitive)
         )
     }
 
@@ -92,7 +109,7 @@ class ProblemServiceUpdateTest {
         val request = UpdateProblemRequest(
             title = "Only Title Updated",
             description = null,
-            schemaSql = null,
+            schemaMetadata = null,
             difficulty = null,
             timeLimit = null,
             isOrderSensitive = null
@@ -103,6 +120,7 @@ class ProblemServiceUpdateTest {
             title = "Only Title Updated",
             description = "Original Description",
             schemaSql = "CREATE TABLE test (id INT)",
+            schemaMetadata = null,
             difficulty = 3,
             timeLimit = 1000,
             isOrderSensitive = false,
@@ -115,26 +133,28 @@ class ProblemServiceUpdateTest {
 
         whenever(
             problemRepository.update(
-                id = 1L,
-                title = request.title,
-                description = null,
-                schemaSql = null,
-                difficulty = null,
-                timeLimit = null,
-                isOrderSensitive = null
+                id = eq(1L),
+                title = eq(request.title),
+                description = eq(null),
+                schemaSql = eq(null),
+                schemaMetadata = eq(null),
+                difficulty = eq(null),
+                timeLimit = eq(null),
+                isOrderSensitive = eq(null)
             )
         ).thenReturn(updatedProblem)
 
         problemService.update(1L, request)
 
         verify(problemRepository).update(
-            id = 1L,
-            title = "Only Title Updated",
-            description = null,
-            schemaSql = null,
-            difficulty = null,
-            timeLimit = null,
-            isOrderSensitive = null
+            id = eq(1L),
+            title = eq("Only Title Updated"),
+            description = eq(null),
+            schemaSql = eq(null),
+            schemaMetadata = eq(null),
+            difficulty = eq(null),
+            timeLimit = eq(null),
+            isOrderSensitive = eq(null)
         )
     }
 
@@ -144,13 +164,14 @@ class ProblemServiceUpdateTest {
 
         whenever(
             problemRepository.update(
-                id = 999L,
-                title = request.title,
-                description = null,
-                schemaSql = null,
-                difficulty = null,
-                timeLimit = null,
-                isOrderSensitive = null
+                id = eq(999L),
+                title = eq(request.title),
+                description = eq(null),
+                schemaSql = eq(null),
+                schemaMetadata = eq(null),
+                difficulty = eq(null),
+                timeLimit = eq(null),
+                isOrderSensitive = eq(null)
             )
         ).thenReturn(null)
 

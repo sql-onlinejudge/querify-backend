@@ -3,6 +3,9 @@ package me.suhyun.soj.domain.testcase.application.service
 import me.suhyun.soj.domain.problem.domain.model.Problem
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
+import me.suhyun.soj.domain.testcase.domain.model.AnswerMetadata
+import me.suhyun.soj.domain.testcase.domain.model.InitMetadata
+import me.suhyun.soj.domain.testcase.domain.model.InsertStatement
 import me.suhyun.soj.domain.testcase.domain.model.TestCase
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.domain.testcase.presentation.request.CreateTestCaseRequest
@@ -29,6 +32,17 @@ class TestCaseServiceCreateTest {
 
     private lateinit var testCaseService: TestCaseService
 
+    private val testInitData = InitMetadata(
+        statements = listOf(
+            InsertStatement(table = "test", rows = listOf(mapOf("id" to 1)))
+        )
+    )
+
+    private val testAnswerData = AnswerMetadata(
+        columns = listOf("id"),
+        rows = listOf(listOf(1))
+    )
+
     @BeforeEach
     fun setUp() {
         testCaseService = TestCaseService(testCaseRepository, problemRepository)
@@ -40,6 +54,7 @@ class TestCaseServiceCreateTest {
             title = "Test Problem",
             description = "Description",
             schemaSql = "CREATE TABLE test (id INT)",
+            schemaMetadata = null,
             difficulty = 3,
             timeLimit = 1000,
             isOrderSensitive = false,
@@ -55,8 +70,8 @@ class TestCaseServiceCreateTest {
     fun `should create testcase successfully`() {
         val problemId = 1L
         val request = CreateTestCaseRequest(
-            initSql = "INSERT INTO test VALUES (1)",
-            answer = "1"
+            initData = testInitData,
+            answerData = testAnswerData
         )
 
         whenever(problemRepository.findById(problemId)).thenReturn(createProblem(problemId))
@@ -64,8 +79,10 @@ class TestCaseServiceCreateTest {
             TestCase(
                 id = 1L,
                 problemId = problemId,
-                initSql = request.initSql,
-                answer = request.answer,
+                initSql = "INSERT INTO test (id) VALUES (1);",
+                initMetadata = request.initData,
+                answer = "id\n1",
+                answerMetadata = request.answerData,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null
@@ -79,11 +96,11 @@ class TestCaseServiceCreateTest {
     }
 
     @Test
-    fun `should create testcase with null initSql`() {
+    fun `should create testcase with null initData`() {
         val problemId = 1L
         val request = CreateTestCaseRequest(
-            initSql = null,
-            answer = "expected result"
+            initData = null,
+            answerData = testAnswerData
         )
 
         whenever(problemRepository.findById(problemId)).thenReturn(createProblem(problemId))
@@ -92,7 +109,9 @@ class TestCaseServiceCreateTest {
                 id = 1L,
                 problemId = problemId,
                 initSql = null,
-                answer = request.answer,
+                initMetadata = null,
+                answer = "id\n1",
+                answerMetadata = request.answerData,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null
@@ -108,8 +127,8 @@ class TestCaseServiceCreateTest {
     fun `should throw PROBLEM_NOT_FOUND when problem does not exist`() {
         val problemId = 999L
         val request = CreateTestCaseRequest(
-            initSql = "INSERT INTO test VALUES (1)",
-            answer = "1"
+            initData = testInitData,
+            answerData = testAnswerData
         )
 
         whenever(problemRepository.findById(problemId)).thenReturn(null)

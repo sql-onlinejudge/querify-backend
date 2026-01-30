@@ -1,6 +1,7 @@
 package me.suhyun.soj.domain.problem.presentation.response
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import java.time.LocalDateTime
 
@@ -9,6 +10,7 @@ data class ProblemDetailResponse(
     val title: String,
     val description: String,
     val schemaSql: String,
+    val schemaMetadata: SchemaMetadata?,
     val difficulty: Int,
     val timeLimit: Int,
     val isOrderSensitive: Boolean,
@@ -25,6 +27,7 @@ data class ProblemDetailResponse(
                 title = problem.title,
                 description = problem.description,
                 schemaSql = problem.schemaSql,
+                schemaMetadata = problem.schemaMetadata,
                 difficulty = problem.difficulty,
                 timeLimit = problem.timeLimit,
                 isOrderSensitive = problem.isOrderSensitive,

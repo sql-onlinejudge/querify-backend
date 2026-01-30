@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.problem.domain.entity
 
+import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -10,6 +11,7 @@ class ProblemEntity(id: EntityID<Long>) : LongEntity(id) {
     var title by ProblemTable.title
     var description by ProblemTable.description
     var schemaSql by ProblemTable.schemaSql
+    var schemaMetadata: SchemaMetadata? by ProblemTable.schemaMetadata
     var difficulty by ProblemTable.difficulty
     var timeLimit by ProblemTable.timeLimit
     var isOrderSensitive by ProblemTable.isOrderSensitive

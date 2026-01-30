@@ -13,6 +13,7 @@ import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
 import me.suhyun.soj.domain.testcase.domain.model.TestCase
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.global.common.dto.PageResponse
+import me.suhyun.soj.global.common.util.SqlGenerator
 import me.suhyun.soj.global.exception.BusinessException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,12 +29,14 @@ class ProblemService(
 ) {
 
     fun create(request: CreateProblemRequest) {
+        val schemaSql = SqlGenerator.generateSchema(request.schemaMetadata)
         val savedProblem = problemRepository.save(
             Problem(
                 id = null,
                 title = request.title,
                 description = request.description,
-                schemaSql = request.schemaSql,
+                schemaSql = schemaSql,
+                schemaMetadata = request.schemaMetadata,
                 difficulty = request.difficulty,
                 timeLimit = request.timeLimit,
                 isOrderSensitive = request.isOrderSensitive,
@@ -46,12 +49,16 @@ class ProblemService(
         )
 
         request.testcases.forEach { input ->
+            val initSql = input.initData?.let { SqlGenerator.generateInit(it) }
+            val answer = SqlGenerator.generateAnswer(input.answerData)
             testCaseRepository.save(
                 TestCase(
                     id = null,
                     problemId = savedProblem.id!!,
-                    initSql = input.initSql,
-                    answer = input.answer,
+                    initSql = initSql,
+                    initMetadata = input.initData,
+                    answer = answer,
+                    answerMetadata = input.answerData,
                     createdAt = LocalDateTime.now(),
                     updatedAt = null,
                     deletedAt = null
@@ -100,11 +107,13 @@ class ProblemService(
     }
 
     fun update(problemId: Long, request: UpdateProblemRequest) {
+        val schemaSql = request.schemaMetadata?.let { SqlGenerator.generateSchema(it) }
         problemRepository.update(
             id = problemId,
             title = request.title,
             description = request.description,
-            schemaSql = request.schemaSql,
+            schemaSql = schemaSql,
+            schemaMetadata = request.schemaMetadata,
             difficulty = request.difficulty,
             timeLimit = request.timeLimit,
             isOrderSensitive = request.isOrderSensitive

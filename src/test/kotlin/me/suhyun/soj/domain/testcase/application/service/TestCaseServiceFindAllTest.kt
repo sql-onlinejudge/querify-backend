@@ -33,7 +33,9 @@ class TestCaseServiceFindAllTest {
             id = id,
             problemId = problemId,
             initSql = "INSERT INTO test VALUES ($id)",
+            initMetadata = null,
             answer = "$id",
+            answerMetadata = null,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null

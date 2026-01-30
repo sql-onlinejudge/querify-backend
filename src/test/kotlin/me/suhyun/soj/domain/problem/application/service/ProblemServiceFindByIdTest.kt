@@ -42,6 +42,7 @@ class ProblemServiceFindByIdTest {
             title = "Test Problem",
             description = "Test Description",
             schemaSql = "CREATE TABLE test (id INT)",
+            schemaMetadata = null,
             difficulty = 3,
             timeLimit = 1000,
             isOrderSensitive = false,

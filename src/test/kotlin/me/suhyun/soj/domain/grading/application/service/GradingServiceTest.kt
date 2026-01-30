@@ -94,6 +94,7 @@ class GradingServiceTest {
             title = "Test Problem",
             description = "Description",
             schemaSql = "CREATE TABLE users (id INT, name VARCHAR(100))",
+            schemaMetadata = null,
             difficulty = 3,
             timeLimit = 1000,
             isOrderSensitive = true,
@@ -110,7 +111,9 @@ class GradingServiceTest {
             id = id,
             problemId = problemId,
             initSql = "INSERT INTO users VALUES (1, 'Alice')",
+            initMetadata = null,
             answer = "1\tAlice",
+            answerMetadata = null,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null
