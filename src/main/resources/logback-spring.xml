@@ -9,7 +9,7 @@
 
   <!-- 일반 로그 (INFO 이상) -->
   <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-    <destination>localhost:5001</destination>
+    <destination>${LOGSTASH_HOST:-localhost}:${LOGSTASH_PORT:-5000}</destination>
     <encoder class="net.logstash.logback.encoder.LogstashEncoder">
       <customFields>{"service":"soj-api"}</customFields>
     </encoder>
@@ -17,7 +17,7 @@
 
   <!-- 에러 로그 (ERROR 이상) -->
   <appender name="LOGSTASH_ERROR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-    <destination>localhost:5001</destination>
+    <destination>${LOGSTASH_HOST:-localhost}:${LOGSTASH_PORT:-5000}</destination>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>ERROR</level>
     </filter>
