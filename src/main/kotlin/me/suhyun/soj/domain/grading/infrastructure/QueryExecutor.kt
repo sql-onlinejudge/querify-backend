@@ -61,6 +61,11 @@ class QueryExecutor(
         val metaData = resultSet.metaData
         val columnCount = metaData.columnCount
 
+        val header = (1..columnCount).joinToString("\t") { i ->
+            metaData.getColumnLabel(i)
+        }
+        result.appendLine(header)
+
         while (resultSet.next()) {
             val row = (1..columnCount).joinToString("\t") { i ->
                 resultSet.getString(i) ?: "NULL"

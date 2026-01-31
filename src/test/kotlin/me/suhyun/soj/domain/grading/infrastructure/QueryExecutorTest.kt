@@ -53,6 +53,8 @@ class QueryExecutorTest {
             whenever(statement.executeQuery(any())).thenReturn(resultSet)
             whenever(resultSet.metaData).thenReturn(metaData)
             whenever(metaData.columnCount).thenReturn(2)
+            whenever(metaData.getColumnLabel(1)).thenReturn("id")
+            whenever(metaData.getColumnLabel(2)).thenReturn("name")
             whenever(resultSet.next()).thenReturn(true, true, false)
             whenever(resultSet.getString(1)).thenReturn("1", "2")
             whenever(resultSet.getString(2)).thenReturn("Alice", "Bob")
@@ -64,6 +66,7 @@ class QueryExecutorTest {
                 timeoutMs = 5000
             )
 
+            assertThat(result).contains("id\tname")
             assertThat(result).contains("1\tAlice")
             assertThat(result).contains("2\tBob")
         }
@@ -76,6 +79,7 @@ class QueryExecutorTest {
             whenever(statement.executeQuery(any())).thenReturn(resultSet)
             whenever(resultSet.metaData).thenReturn(metaData)
             whenever(metaData.columnCount).thenReturn(1)
+            whenever(metaData.getColumnLabel(1)).thenReturn("id")
             whenever(resultSet.next()).thenReturn(false)
 
             val result = queryExecutor.execute(
@@ -85,7 +89,7 @@ class QueryExecutorTest {
                 timeoutMs = 5000
             )
 
-            assertThat(result).isEmpty()
+            assertThat(result).isEqualTo("id")
         }
 
         @Test
@@ -96,6 +100,8 @@ class QueryExecutorTest {
             whenever(statement.executeQuery(any())).thenReturn(resultSet)
             whenever(resultSet.metaData).thenReturn(metaData)
             whenever(metaData.columnCount).thenReturn(2)
+            whenever(metaData.getColumnLabel(1)).thenReturn("id")
+            whenever(metaData.getColumnLabel(2)).thenReturn("name")
             whenever(resultSet.next()).thenReturn(true, false)
             whenever(resultSet.getString(1)).thenReturn("1")
             whenever(resultSet.getString(2)).thenReturn(null)
@@ -107,7 +113,8 @@ class QueryExecutorTest {
                 timeoutMs = 5000
             )
 
-            assertThat(result).contains("NULL")
+            assertThat(result).contains("id\tname")
+            assertThat(result).contains("1\tNULL")
         }
     }
 
