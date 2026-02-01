@@ -15,6 +15,9 @@ import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.global.common.dto.PageResponse
 import me.suhyun.soj.global.common.util.SqlGenerator
 import me.suhyun.soj.global.exception.BusinessException
+import me.suhyun.soj.global.infrastructure.cache.CacheKeys
+import me.suhyun.soj.global.infrastructure.cache.CacheService
+import me.suhyun.soj.global.infrastructure.cache.config.CacheProperties
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -25,7 +28,9 @@ import java.util.UUID
 class ProblemService(
     private val problemRepository: ProblemRepository,
     private val testCaseRepository: TestCaseRepository,
-    private val submissionRepository: SubmissionRepository
+    private val submissionRepository: SubmissionRepository,
+    private val cacheService: CacheService,
+    private val cacheProperties: CacheProperties
 ) {
 
     fun create(request: CreateProblemRequest) {
@@ -100,10 +105,21 @@ class ProblemService(
 
     @Transactional(readOnly = true)
     fun findById(problemId: Long, userId: UUID?): ProblemDetailResponse {
-        val problem = problemRepository.findById(problemId)
+        val problem = getCachedProblem(problemId)
+            ?: problemRepository.findById(problemId)?.also { cacheProblem(it) }
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
         val trialStatus = getTrialStatus(problemId, userId)
         return ProblemDetailResponse.from(problem, trialStatus)
+    }
+
+    private fun getCachedProblem(id: Long): Problem? {
+        return cacheService.get(CacheKeys.Problem.byId(id), Problem::class.java)
+    }
+
+    private fun cacheProblem(problem: Problem) {
+        problem.id?.let {
+            cacheService.put(CacheKeys.Problem.byId(it), problem, cacheProperties.ttl.problem)
+        }
     }
 
     fun update(problemId: Long, request: UpdateProblemRequest) {
@@ -118,6 +134,7 @@ class ProblemService(
             timeLimit = request.timeLimit,
             isOrderSensitive = request.isOrderSensitive
         ) ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+        cacheService.evict(CacheKeys.Problem.byId(problemId))
     }
 
     fun delete(problemId: Long) {
@@ -125,6 +142,7 @@ class ProblemService(
         if (!deleted) {
             throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
         }
+        cacheService.evict(CacheKeys.Problem.byId(problemId))
     }
 
     private fun getTrialStatuses(problemIds: List<Long>, userId: UUID): Map<Long, TrialStatus> {
