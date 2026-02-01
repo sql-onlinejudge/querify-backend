@@ -10,6 +10,8 @@ import me.suhyun.soj.domain.testcase.presentation.request.UpdateTestCaseRequest
 import me.suhyun.soj.domain.testcase.presentation.response.TestCaseResponse
 import me.suhyun.soj.global.common.util.SqlGenerator
 import me.suhyun.soj.global.exception.BusinessException
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -21,6 +23,7 @@ class TestCaseService(
     private val problemRepository: ProblemRepository
 ) {
 
+    @CacheEvict(value = ["testcases"], key = "#problemId")
     fun create(problemId: Long, request: CreateTestCaseRequest) {
         val problem = problemRepository.findById(problemId)
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
@@ -43,6 +46,7 @@ class TestCaseService(
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = ["testcases"], key = "#problemId")
     fun findAll(problemId: Long): List<TestCaseResponse> {
         return testCaseRepository.findAllByProblemId(problemId)
             .map { TestCaseResponse.from(it) }
@@ -58,6 +62,7 @@ class TestCaseService(
         return TestCaseResponse.from(testCase)
     }
 
+    @CacheEvict(value = ["testcases"], key = "#problemId")
     fun update(problemId: Long, testcaseId: Long, request: UpdateTestCaseRequest) {
         val testCase = testCaseRepository.findById(testcaseId)
             ?: throw BusinessException(TestCaseErrorCode.TEST_CASE_NOT_FOUND)
@@ -69,6 +74,7 @@ class TestCaseService(
         testCaseRepository.update(testcaseId, initSql, request.initData, answer, request.answerData)
     }
 
+    @CacheEvict(value = ["testcases"], key = "#problemId")
     fun delete(problemId: Long, testcaseId: Long) {
         val testCase = testCaseRepository.findById(testcaseId)
             ?: throw BusinessException(TestCaseErrorCode.TEST_CASE_NOT_FOUND)
