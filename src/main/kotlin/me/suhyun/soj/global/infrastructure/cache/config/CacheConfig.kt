@@ -1,6 +1,7 @@
 package me.suhyun.soj.global.infrastructure.cache.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,6 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 
 @Configuration
 @EnableCaching
+@ConditionalOnBean(RedisConnectionFactory::class)
 class CacheConfig(
     private val properties: CacheProperties,
     private val objectMapper: ObjectMapper
