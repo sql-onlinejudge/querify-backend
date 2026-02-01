@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.grading.application.service
 import me.suhyun.soj.domain.grading.exception.QueryExecutionException
 import me.suhyun.soj.domain.grading.exception.QueryTimeoutException
 import me.suhyun.soj.domain.grading.infrastructure.QueryExecutor
+import me.suhyun.soj.domain.grading.infrastructure.QueryValidator
 import me.suhyun.soj.domain.grading.infrastructure.sse.SseEmitterService
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
@@ -12,6 +13,7 @@ import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
 import me.suhyun.soj.domain.submission.exception.SubmissionErrorCode
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.global.exception.BusinessException
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,6 +24,7 @@ class GradingService(
     private val problemRepository: ProblemRepository,
     private val testCaseRepository: TestCaseRepository,
     private val queryExecutor: QueryExecutor,
+    private val queryValidator: QueryValidator,
     private val resultComparator: ResultComparator,
     private val sseEmitterService: SseEmitterService
 ) {
@@ -39,6 +42,8 @@ class GradingService(
         sseEmitterService.send(submissionId, SubmissionStatus.RUNNING, null)
 
         val verdict = try {
+            queryValidator.validate(submission.query)
+
             var allPassed = true
 
             for (testCase in testCases) {
@@ -62,6 +67,8 @@ class GradingService(
             }
 
             if (allPassed) SubmissionVerdict.ACCEPTED else SubmissionVerdict.WRONG_ANSWER
+        } catch (e: BusinessException) {
+            SubmissionVerdict.INVALID_QUERY
         } catch (e: QueryTimeoutException) {
             SubmissionVerdict.TIME_LIMIT_EXCEEDED
         } catch (e: QueryExecutionException) {

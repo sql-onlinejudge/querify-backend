@@ -10,8 +10,14 @@ import javax.sql.DataSource
 class SandboxDataSourceConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "sandbox.datasource")
-    fun sandboxDataSource(): DataSource {
+    @ConfigurationProperties(prefix = "sandbox.datasource.admin")
+    fun sandboxAdminDataSource(): DataSource {
+        return DataSourceBuilder.create().build()
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "sandbox.datasource.readonly")
+    fun sandboxReadonlyDataSource(): DataSource {
         return DataSourceBuilder.create().build()
     }
 }

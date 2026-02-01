@@ -21,13 +21,22 @@ import javax.sql.DataSource
 class QueryExecutorTest {
 
     @Mock
-    private lateinit var dataSource: DataSource
+    private lateinit var adminDataSource: DataSource
 
     @Mock
-    private lateinit var connection: Connection
+    private lateinit var readonlyDataSource: DataSource
 
     @Mock
-    private lateinit var statement: Statement
+    private lateinit var adminConnection: Connection
+
+    @Mock
+    private lateinit var readonlyConnection: Connection
+
+    @Mock
+    private lateinit var adminStatement: Statement
+
+    @Mock
+    private lateinit var readonlyStatement: Statement
 
     @Mock
     private lateinit var resultSet: ResultSet
@@ -39,7 +48,7 @@ class QueryExecutorTest {
 
     @BeforeEach
     fun setUp() {
-        queryExecutor = QueryExecutor(dataSource)
+        queryExecutor = QueryExecutor(adminDataSource, readonlyDataSource)
     }
 
     @Nested
@@ -47,10 +56,13 @@ class QueryExecutorTest {
 
         @Test
         fun `should execute query and return result`() {
-            whenever(dataSource.connection).thenReturn(connection)
-            whenever(connection.createStatement()).thenReturn(statement)
-            whenever(statement.execute(any())).thenReturn(true)
-            whenever(statement.executeQuery(any())).thenReturn(resultSet)
+            whenever(adminDataSource.connection).thenReturn(adminConnection)
+            whenever(adminConnection.createStatement()).thenReturn(adminStatement)
+            whenever(adminStatement.execute(any())).thenReturn(true)
+
+            whenever(readonlyDataSource.connection).thenReturn(readonlyConnection)
+            whenever(readonlyConnection.createStatement()).thenReturn(readonlyStatement)
+            whenever(readonlyStatement.executeQuery(any())).thenReturn(resultSet)
             whenever(resultSet.metaData).thenReturn(metaData)
             whenever(metaData.columnCount).thenReturn(2)
             whenever(metaData.getColumnLabel(1)).thenReturn("id")
@@ -73,10 +85,13 @@ class QueryExecutorTest {
 
         @Test
         fun `should execute query without initSql`() {
-            whenever(dataSource.connection).thenReturn(connection)
-            whenever(connection.createStatement()).thenReturn(statement)
-            whenever(statement.execute(any())).thenReturn(true)
-            whenever(statement.executeQuery(any())).thenReturn(resultSet)
+            whenever(adminDataSource.connection).thenReturn(adminConnection)
+            whenever(adminConnection.createStatement()).thenReturn(adminStatement)
+            whenever(adminStatement.execute(any())).thenReturn(true)
+
+            whenever(readonlyDataSource.connection).thenReturn(readonlyConnection)
+            whenever(readonlyConnection.createStatement()).thenReturn(readonlyStatement)
+            whenever(readonlyStatement.executeQuery(any())).thenReturn(resultSet)
             whenever(resultSet.metaData).thenReturn(metaData)
             whenever(metaData.columnCount).thenReturn(1)
             whenever(metaData.getColumnLabel(1)).thenReturn("id")
@@ -94,10 +109,13 @@ class QueryExecutorTest {
 
         @Test
         fun `should handle NULL values in result`() {
-            whenever(dataSource.connection).thenReturn(connection)
-            whenever(connection.createStatement()).thenReturn(statement)
-            whenever(statement.execute(any())).thenReturn(true)
-            whenever(statement.executeQuery(any())).thenReturn(resultSet)
+            whenever(adminDataSource.connection).thenReturn(adminConnection)
+            whenever(adminConnection.createStatement()).thenReturn(adminStatement)
+            whenever(adminStatement.execute(any())).thenReturn(true)
+
+            whenever(readonlyDataSource.connection).thenReturn(readonlyConnection)
+            whenever(readonlyConnection.createStatement()).thenReturn(readonlyStatement)
+            whenever(readonlyStatement.executeQuery(any())).thenReturn(resultSet)
             whenever(resultSet.metaData).thenReturn(metaData)
             whenever(metaData.columnCount).thenReturn(2)
             whenever(metaData.getColumnLabel(1)).thenReturn("id")
@@ -123,9 +141,9 @@ class QueryExecutorTest {
 
         @Test
         fun `should throw QueryExecutionException on SQL error`() {
-            whenever(dataSource.connection).thenReturn(connection)
-            whenever(connection.createStatement()).thenReturn(statement)
-            whenever(statement.execute(any())).thenThrow(RuntimeException("SQL syntax error"))
+            whenever(adminDataSource.connection).thenReturn(adminConnection)
+            whenever(adminConnection.createStatement()).thenReturn(adminStatement)
+            whenever(adminStatement.execute(any())).thenThrow(RuntimeException("SQL syntax error"))
 
             assertThatThrownBy {
                 queryExecutor.execute(

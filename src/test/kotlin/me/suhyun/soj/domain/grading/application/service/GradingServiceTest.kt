@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.grading.application.service
 import me.suhyun.soj.domain.grading.exception.QueryExecutionException
 import me.suhyun.soj.domain.grading.exception.QueryTimeoutException
 import me.suhyun.soj.domain.grading.infrastructure.QueryExecutor
+import me.suhyun.soj.domain.grading.infrastructure.QueryValidator
 import me.suhyun.soj.domain.grading.infrastructure.sse.SseEmitterService
 import me.suhyun.soj.domain.problem.domain.model.Problem
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
@@ -51,6 +52,9 @@ class GradingServiceTest {
     private lateinit var queryExecutor: QueryExecutor
 
     @Mock
+    private lateinit var queryValidator: QueryValidator
+
+    @Mock
     private lateinit var resultComparator: ResultComparator
 
     @Mock
@@ -69,6 +73,7 @@ class GradingServiceTest {
             problemRepository,
             testCaseRepository,
             queryExecutor,
+            queryValidator,
             resultComparator,
             sseEmitterService
         )

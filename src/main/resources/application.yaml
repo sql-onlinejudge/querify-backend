@@ -28,10 +28,16 @@ spring:
 # Sandbox MySQL
 sandbox:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbc-url: jdbc:mysql://${SANDBOX_MYSQL_HOST:localhost}:${SANDBOX_MYSQL_PORT:3309}/${SANDBOX_MYSQL_DATABASE:sandbox}?useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
-    username: ${SANDBOX_MYSQL_USERNAME:sandbox_readonly}
-    password: ${SANDBOX_MYSQL_PASSWORD:sandbox_readonly}
+    admin:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://${SANDBOX_MYSQL_HOST:localhost}:${SANDBOX_MYSQL_PORT:3309}/${SANDBOX_MYSQL_DATABASE:sandbox}?useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
+      username: ${SANDBOX_MYSQL_USERNAME:root}
+      password: ${SANDBOX_MYSQL_PASSWORD:sandbox}
+    readonly:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://${SANDBOX_MYSQL_HOST:localhost}:${SANDBOX_MYSQL_PORT:3309}/${SANDBOX_MYSQL_DATABASE:sandbox}?useSSL=false&allowPublicKeyRetrieval=true
+      username: ${SANDBOX_READONLY_USERNAME:sandbox_readonly}
+      password: ${SANDBOX_READONLY_PASSWORD:sandbox_readonly}
 
 # Sentry
 sentry:
@@ -74,3 +80,11 @@ notification:
     error-webhook-url: ${DISCORD_ERROR_WEBHOOK_URL:}
   slack:
     webhook-url: ${SLACK_WEBHOOK_URL:}
+
+cache:
+  provider: ${CACHE_PROVIDER:redis}
+  ttl:
+    default: 10m
+    user: 60m
+    problem: 30m
+    testcase: 30m

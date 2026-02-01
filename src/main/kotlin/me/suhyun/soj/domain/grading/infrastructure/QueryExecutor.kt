@@ -12,8 +12,11 @@ import javax.sql.DataSource
 
 @Component
 class QueryExecutor(
-    @Qualifier("sandboxDataSource")
-    private val dataSource: DataSource
+    @Qualifier("sandboxAdminDataSource")
+    private val adminDataSource: DataSource,
+
+    @Qualifier("sandboxReadonlyDataSource")
+    private val readonlyDataSource: DataSource
 ) {
 
     fun execute(schemaSql: String, initSql: String?, query: String, timeoutMs: Int): String {
@@ -21,18 +24,20 @@ class QueryExecutor(
 
         try {
             val future = executor.submit<String> {
-                dataSource.connection.use { connection ->
-                    connection.createStatement().use { statement ->
+                adminDataSource.connection.use { adminConn ->
+                    adminConn.createStatement().use { stmt ->
                         val tableNames = extractTableNames(schemaSql)
-                        tableNames.forEach { tableName ->
-                            statement.execute("DROP TABLE IF EXISTS $tableName")
-                        }
+                        stmt.execute("SET FOREIGN_KEY_CHECKS=0")
+                        tableNames.forEach { stmt.execute("DROP TABLE IF EXISTS `$it`") }
+                        stmt.execute("SET FOREIGN_KEY_CHECKS=1")
+                        stmt.execute(schemaSql)
+                        initSql?.let { stmt.execute(it) }
+                    }
+                }
 
-                        statement.execute(schemaSql)
-
-                        initSql?.let { statement.execute(it) }
-
-                        val resultSet = statement.executeQuery(query)
+                readonlyDataSource.connection.use { readonlyConn ->
+                    readonlyConn.createStatement().use { stmt ->
+                        val resultSet = stmt.executeQuery(query)
                         resultSetToString(resultSet)
                     }
                 }
@@ -52,7 +57,7 @@ class QueryExecutor(
     }
 
     private fun extractTableNames(schemaSql: String): List<String> {
-        val regex = Regex("""CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)""", RegexOption.IGNORE_CASE)
+        val regex = Regex("""CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?`?(\w+)`?""", RegexOption.IGNORE_CASE)
         return regex.findAll(schemaSql).map { it.groupValues[1] }.toList()
     }
 
