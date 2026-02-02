@@ -7,5 +7,5 @@ enum class AdminErrorCode(
     override val status: HttpStatus,
     override val message: String
 ) : ErrorCode {
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Invalid email or password")
+    INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid email or password")
 }

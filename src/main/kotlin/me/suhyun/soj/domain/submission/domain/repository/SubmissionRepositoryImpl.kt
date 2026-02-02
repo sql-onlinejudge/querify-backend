@@ -3,11 +3,14 @@ package me.suhyun.soj.domain.submission.domain.repository
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.submission.domain.entity.SubmissionEntity
 import me.suhyun.soj.domain.submission.domain.entity.SubmissionTable
+import me.suhyun.soj.domain.submission.domain.model.DailySubmissionCount
 import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionStatus
 import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionVerdict
 import me.suhyun.soj.domain.submission.domain.model.Submission
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.count
+import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -32,6 +35,23 @@ class SubmissionRepositoryImpl : SubmissionRepository {
         return SubmissionEntity.findById(id)
             ?.takeIf { it.deletedAt == null }
             ?.let { Submission.from(it) }
+    }
+
+    override fun findAll(problemId: Long?, page: Int, size: Int): List<Submission> {
+        return SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .apply { problemId?.let { andWhere { SubmissionTable.problemId eq it } } }
+            .orderBy(SubmissionTable.createdAt, SortOrder.DESC)
+            .limit(size, (page * size).toLong())
+            .map { SubmissionEntity.wrapRow(it) }
+            .map { Submission.from(it) }
+    }
+
+    override fun countAll(problemId: Long?): Long {
+        return SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .apply { problemId?.let { andWhere { SubmissionTable.problemId eq it } } }
+            .count()
     }
 
     override fun findByProblemId(problemId: Long, page: Int, size: Int): List<Submission> {
@@ -108,5 +128,45 @@ class SubmissionRepositoryImpl : SubmissionRepository {
         entity.verdict = verdict
         entity.updatedAt = LocalDateTime.now()
         return true
+    }
+
+    override fun countAll(): Long {
+        return SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .count()
+    }
+
+    override fun countByStatus(status: SubmissionStatus): Long {
+        return SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .andWhere { SubmissionTable.status eq status }
+            .count()
+    }
+
+    override fun countByDateGrouped(startDate: LocalDateTime, endDate: LocalDateTime): List<DailySubmissionCount> {
+        val dateExpr = SubmissionTable.createdAt.date()
+        val countExpr = SubmissionTable.id.count()
+        return SubmissionTable
+            .select(dateExpr, countExpr)
+            .where { SubmissionTable.deletedAt.isNull() }
+            .andWhere { SubmissionTable.createdAt greaterEq startDate }
+            .andWhere { SubmissionTable.createdAt lessEq endDate }
+            .groupBy(dateExpr)
+            .orderBy(dateExpr)
+            .map { row ->
+                DailySubmissionCount(
+                    date = row[dateExpr],
+                    count = row[countExpr]
+                )
+            }
+    }
+
+    override fun findRecent(limit: Int): List<Submission> {
+        return SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .orderBy(SubmissionTable.createdAt, SortOrder.DESC)
+            .limit(limit)
+            .map { SubmissionEntity.wrapRow(it) }
+            .map { Submission.from(it) }
     }
 }

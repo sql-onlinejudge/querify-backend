@@ -5,6 +5,8 @@ import me.suhyun.soj.domain.user.domain.entity.UserTable
 import me.suhyun.soj.domain.user.domain.model.User
 import me.suhyun.soj.domain.user.domain.model.enums.AuthProvider
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -79,5 +81,11 @@ class UserRepositoryImpl : UserRepository {
         }.firstOrNull()?.let {
             it.deletedAt = LocalDateTime.now()
         }
+    }
+
+    override fun countAll(): Long {
+        return UserTable.selectAll()
+            .andWhere { UserTable.deletedAt.isNull() }
+            .count()
     }
 }

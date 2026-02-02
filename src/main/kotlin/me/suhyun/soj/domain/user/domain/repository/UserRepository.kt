@@ -12,4 +12,5 @@ interface UserRepository {
     fun findByEmail(email: String): User?
     fun update(user: User): User
     fun softDelete(uuid: UUID)
+    fun countAll(): Long
 }
