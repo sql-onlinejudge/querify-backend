@@ -80,7 +80,8 @@ class ProblemService(
         maxDifficulty: Int?,
         keyword: String?,
         sort: List<String>,
-        userId: UUID
+        userId: UUID,
+        trialStatus: TrialStatus? = null
     ): PageResponse<ProblemResponse> {
         val problems = problemRepository.findAll(
             page = page,
@@ -88,9 +89,13 @@ class ProblemService(
             minDifficulty = minDifficulty,
             maxDifficulty = maxDifficulty,
             keyword = keyword,
-            sort = sort
+            sort = sort,
+            trialStatus = trialStatus,
+            userId = userId
         )
-        val totalElements = problemRepository.countAll(minDifficulty, maxDifficulty, keyword)
+        val totalElements = problemRepository.countAll(
+            minDifficulty, maxDifficulty, keyword, trialStatus, userId
+        )
 
         val problemIds = problems.mapNotNull { it.id }
         val trialStatuses = getTrialStatuses(problemIds, userId)

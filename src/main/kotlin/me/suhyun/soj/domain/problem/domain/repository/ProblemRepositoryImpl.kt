@@ -4,15 +4,22 @@ import me.suhyun.soj.domain.problem.domain.entity.ProblemEntity
 import me.suhyun.soj.domain.problem.domain.entity.ProblemTable
 import me.suhyun.soj.domain.problem.domain.model.Problem
 import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
+import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
+import me.suhyun.soj.domain.submission.domain.entity.SubmissionTable
+import me.suhyun.soj.domain.submission.domain.model.enums.SubmissionVerdict
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.exists
+import org.jetbrains.exposed.sql.notExists
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Repository
 class ProblemRepositoryImpl : ProblemRepository {
@@ -43,9 +50,11 @@ class ProblemRepositoryImpl : ProblemRepository {
         minDifficulty: Int?,
         maxDifficulty: Int?,
         keyword: String?,
-        sort: List<String>
+        sort: List<String>,
+        trialStatus: TrialStatus?,
+        userId: UUID?
     ): List<Problem> {
-        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword)
+        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword, trialStatus, userId)
 
         val sortCriteria = parseSortCriteria(sort)
         sortCriteria.forEach { (column, order) ->
@@ -76,8 +85,14 @@ class ProblemRepositoryImpl : ProblemRepository {
         }
     }
 
-    override fun countAll(minDifficulty: Int?, maxDifficulty: Int?, keyword: String?): Long {
-        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword)
+    override fun countAll(
+        minDifficulty: Int?,
+        maxDifficulty: Int?,
+        keyword: String?,
+        trialStatus: TrialStatus?,
+        userId: UUID?
+    ): Long {
+        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword, trialStatus, userId)
 
         return query.count()
     }
@@ -133,7 +148,13 @@ class ProblemRepositoryImpl : ProblemRepository {
         }
     }
 
-    private fun buildFilteredQuery(minDifficulty: Int?, maxDifficulty: Int?, keyword: String?): Query {
+    private fun buildFilteredQuery(
+        minDifficulty: Int?,
+        maxDifficulty: Int?,
+        keyword: String?,
+        trialStatus: TrialStatus? = null,
+        userId: UUID? = null
+    ): Query {
         val query = ProblemTable.selectAll()
             .andWhere { ProblemTable.deletedAt.isNull() }
 
@@ -156,6 +177,30 @@ class ProblemRepositoryImpl : ProblemRepository {
                 }
             }
         }
+
+        if (trialStatus != null && userId != null) {
+            val userIdStr = userId.toString()
+
+            val hasSubmission = SubmissionTable.selectAll().where {
+                (SubmissionTable.problemId eq ProblemTable.id) and
+                    (SubmissionTable.userId eq userIdStr) and
+                    SubmissionTable.deletedAt.isNull()
+            }
+
+            val hasAccepted = SubmissionTable.selectAll().where {
+                (SubmissionTable.problemId eq ProblemTable.id) and
+                    (SubmissionTable.userId eq userIdStr) and
+                    (SubmissionTable.verdict eq SubmissionVerdict.ACCEPTED) and
+                    SubmissionTable.deletedAt.isNull()
+            }
+
+            when (trialStatus) {
+                TrialStatus.SOLVED -> query.andWhere { exists(hasAccepted) }
+                TrialStatus.ATTEMPTED -> query.andWhere { exists(hasSubmission) and notExists(hasAccepted) }
+                TrialStatus.NOT_ATTEMPTED -> query.andWhere { notExists(hasSubmission) }
+            }
+        }
+
         return query
     }
 }

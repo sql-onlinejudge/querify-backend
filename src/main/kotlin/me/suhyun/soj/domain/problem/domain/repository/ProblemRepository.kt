@@ -2,6 +2,8 @@ package me.suhyun.soj.domain.problem.domain.repository
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
 import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
+import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
+import java.util.UUID
 
 interface ProblemRepository {
     fun save(problem: Problem): Problem
@@ -12,9 +14,17 @@ interface ProblemRepository {
         minDifficulty: Int?,
         maxDifficulty: Int?,
         keyword: String?,
-        sort: List<String>
+        sort: List<String>,
+        trialStatus: TrialStatus? = null,
+        userId: UUID? = null
     ): List<Problem>
-    fun countAll(minDifficulty: Int?, maxDifficulty: Int?, keyword: String?): Long
+    fun countAll(
+        minDifficulty: Int?,
+        maxDifficulty: Int?,
+        keyword: String?,
+        trialStatus: TrialStatus? = null,
+        userId: UUID? = null
+    ): Long
     fun update(
         id: Long,
         title: String?,
