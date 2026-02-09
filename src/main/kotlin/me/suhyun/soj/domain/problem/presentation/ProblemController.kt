@@ -2,6 +2,7 @@ package me.suhyun.soj.domain.problem.presentation
 
 import jakarta.validation.Valid
 import me.suhyun.soj.domain.problem.application.service.ProblemService
+import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.presentation.request.CreateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.request.UpdateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.response.ProblemDetailResponse
@@ -43,6 +44,7 @@ class ProblemController(
         @RequestParam(required = false) maxDifficulty: Int?,
         @RequestParam(required = false) keyword: String?,
         @RequestParam(defaultValue = "id:desc") sort: List<String>,
+        @RequestParam(required = false) trialStatus: TrialStatus?,
         @RequestHeader("X-User-Id") userId: String,
     ): PageResponse<ProblemResponse> {
         return problemService.findAll(
@@ -52,7 +54,8 @@ class ProblemController(
             maxDifficulty = maxDifficulty,
             keyword = keyword,
             sort = sort,
-            userId = UUID.fromString(userId)
+            userId = UUID.fromString(userId),
+            trialStatus = trialStatus
         )
     }
 
