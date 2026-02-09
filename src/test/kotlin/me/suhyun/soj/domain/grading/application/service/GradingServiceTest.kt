@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.grading.application.service
 
+import me.suhyun.soj.domain.grading.exception.GradingErrorCode
 import me.suhyun.soj.domain.grading.exception.QueryExecutionException
 import me.suhyun.soj.domain.grading.exception.QueryTimeoutException
 import me.suhyun.soj.domain.grading.infrastructure.QueryExecutor
@@ -29,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -252,6 +254,24 @@ class GradingServiceTest {
                 .isInstanceOf(BusinessException::class.java)
                 .extracting("errorCode")
                 .isEqualTo(SubmissionErrorCode.SUBMISSION_NOT_FOUND)
+        }
+
+        @Test
+        fun `should return INVALID_QUERY when query validation fails`() {
+            val submission = createSubmission()
+            val problem = createProblem()
+            val testCases = listOf(createTestCase(1L))
+
+            whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
+            whenever(problemRepository.findById(problemId)).thenReturn(problem)
+            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
+            doThrow(BusinessException(GradingErrorCode.FORBIDDEN_SQL_STATEMENT))
+                .whenever(queryValidator).validate(any())
+
+            val result = gradingService.grade(submissionId)
+
+            assertThat(result).isEqualTo(SubmissionVerdict.INVALID_QUERY)
         }
 
         @Test
