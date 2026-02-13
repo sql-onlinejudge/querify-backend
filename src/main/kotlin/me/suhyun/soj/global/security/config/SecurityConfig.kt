@@ -1,5 +1,8 @@
 package me.suhyun.soj.global.security.config
 
+import me.suhyun.soj.domain.auth.application.config.OAuthProperties
+import me.suhyun.soj.domain.auth.application.handler.OAuth2LoginSuccessHandler
+import me.suhyun.soj.domain.auth.application.service.CustomOAuth2UserService
 import me.suhyun.soj.global.security.handler.JwtAccessDeniedHandler
 import me.suhyun.soj.global.security.handler.JwtAuthenticationEntryPoint
 import me.suhyun.soj.global.security.jwt.JwtAuthenticationFilter
@@ -21,11 +24,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties(JwtProperties::class)
+@EnableConfigurationProperties(JwtProperties::class, OAuthProperties::class)
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
+    private val customOAuth2UserService: CustomOAuth2UserService,
+    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler
 ) {
 
     @Bean
@@ -52,10 +57,14 @@ class SecurityConfig(
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) }
             .exceptionHandling { exception ->
                 exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 exception.accessDeniedHandler(jwtAccessDeniedHandler)
+            }
+            .oauth2Login { oauth2 ->
+                oauth2.userInfoEndpoint { it.userService(customOAuth2UserService) }
+                oauth2.successHandler(oAuth2LoginSuccessHandler)
             }
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers("/admin/login").permitAll()
