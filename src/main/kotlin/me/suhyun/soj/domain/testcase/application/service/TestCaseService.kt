@@ -23,6 +23,7 @@ class TestCaseService(
     private val problemRepository: ProblemRepository
 ) {
 
+    // TODO 보일 예시와 테스트 케이스 구분
     @CacheEvict(value = ["testcases"], key = "#problemId")
     fun create(problemId: Long, request: CreateTestCaseRequest) {
         val problem = problemRepository.findById(problemId)
