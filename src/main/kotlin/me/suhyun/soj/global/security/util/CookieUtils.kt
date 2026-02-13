@@ -32,7 +32,7 @@ class CookieUtils(
     private fun addCookie(response: HttpServletResponse, name: String, value: String, maxAge: Long) {
         val cookie = ResponseCookie.from(name, value)
             .httpOnly(true)
-            .secure(false)
+            .secure(true)
             .path("/")
             .maxAge(maxAge)
             .sameSite("Lax")

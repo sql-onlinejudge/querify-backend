@@ -41,7 +41,7 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = this@SecurityConfig.allowedOrigins.split(",").map { it.trim() }
+            allowedOriginPatterns = this@SecurityConfig.allowedOrigins.split(",").map { it.trim() }
             allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             allowedHeaders = listOf("*")
             allowCredentials = true
@@ -69,6 +69,7 @@ class SecurityConfig(
                 oauth2.successHandler(oAuth2LoginSuccessHandler)
             }
             .authorizeHttpRequests { auth ->
+                auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 auth.requestMatchers("/admin/login").permitAll()
                 auth.requestMatchers("/auth/logout").permitAll()
                 auth.requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
