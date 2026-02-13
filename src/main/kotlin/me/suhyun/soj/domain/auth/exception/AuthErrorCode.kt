@@ -7,5 +7,6 @@ enum class AuthErrorCode(
     override val status: HttpStatus,
     override val message: String
 ) : ErrorCode {
-    GOOGLE_AUTH_FAILED(HttpStatus.BAD_GATEWAY, "Failed to authenticate with Google")
+    GOOGLE_AUTH_FAILED(HttpStatus.BAD_GATEWAY, "Failed to authenticate with Google"),
+    GITHUB_AUTH_FAILED(HttpStatus.BAD_GATEWAY, "Failed to authenticate with GitHub")
 }

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.UUID
@@ -62,10 +61,10 @@ class AdminAuthServiceTest {
             whenever(jwtTokenProvider.createAccessToken(adminUser)).thenReturn("access-token")
             whenever(jwtTokenProvider.createRefreshToken(adminUser)).thenReturn("refresh-token")
 
-            val response = adminAuthService.login(request)
+            val (accessToken, refreshToken) = adminAuthService.login(request)
 
-            assertThat(response.accessToken).isEqualTo("access-token")
-            assertThat(response.refreshToken).isEqualTo("refresh-token")
+            assertThat(accessToken).isEqualTo("access-token")
+            assertThat(refreshToken).isEqualTo("refresh-token")
         }
 
         @Test

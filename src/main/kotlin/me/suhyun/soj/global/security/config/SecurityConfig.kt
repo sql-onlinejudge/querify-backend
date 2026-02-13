@@ -7,6 +7,7 @@ import me.suhyun.soj.global.security.handler.JwtAccessDeniedHandler
 import me.suhyun.soj.global.security.handler.JwtAuthenticationEntryPoint
 import me.suhyun.soj.global.security.jwt.JwtAuthenticationFilter
 import me.suhyun.soj.global.security.jwt.JwtProperties
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -30,7 +31,8 @@ class SecurityConfig(
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
     private val customOAuth2UserService: CustomOAuth2UserService,
-    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler
+    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler,
+    @Value("\${cors.allowed-origins:http://localhost:3000}") private val allowedOrigins: String
 ) {
 
     @Bean
@@ -39,7 +41,7 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
-            allowedOriginPatterns = listOf("*")
+            allowedOrigins = this@SecurityConfig.allowedOrigins.split(",").map { it.trim() }
             allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             allowedHeaders = listOf("*")
             allowCredentials = true
@@ -68,6 +70,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers("/admin/login").permitAll()
+                auth.requestMatchers("/auth/logout").permitAll()
                 auth.requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/problems/**").permitAll()
                 auth.requestMatchers(HttpMethod.POST, "/problems/*/submissions").permitAll()

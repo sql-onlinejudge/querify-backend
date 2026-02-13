@@ -1,6 +1,7 @@
 package me.suhyun.soj.domain.workbook.application.service
 
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
+import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
 import me.suhyun.soj.domain.workbook.domain.model.WorkbookProblem
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookProblemRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
@@ -23,11 +24,14 @@ class WorkbookProblemServiceDeleteTest {
     @Mock
     private lateinit var problemRepository: ProblemRepository
 
+    @Mock
+    private lateinit var submissionRepository: SubmissionRepository
+
     private lateinit var workbookProblemService: WorkbookProblemService
 
     @BeforeEach
     fun setUp() {
-        workbookProblemService = WorkbookProblemService(workbookProblemRepository, problemRepository)
+        workbookProblemService = WorkbookProblemService(workbookProblemRepository, problemRepository, submissionRepository)
     }
 
     @Test

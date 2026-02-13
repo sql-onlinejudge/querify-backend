@@ -3,6 +3,7 @@ package me.suhyun.soj.global.security.jwt
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import me.suhyun.soj.global.security.util.CookieUtils
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -12,7 +13,8 @@ import java.util.UUID
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val cookieUtils: CookieUtils
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -20,7 +22,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = resolveToken(request)
+        val token = cookieUtils.resolveAccessToken(request)
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             val authentication = jwtTokenProvider.getAuthentication(token)
@@ -37,7 +39,6 @@ class JwtAuthenticationFilter(
                     val authentication = UsernamePasswordAuthenticationToken(uuid, null, authorities)
                     SecurityContextHolder.getContext().authentication = authentication
                 } catch (e: IllegalArgumentException) {
-                    // invalid UUID, skip
                 }
             }
         }
@@ -45,17 +46,7 @@ class JwtAuthenticationFilter(
         filterChain.doFilter(request, response)
     }
 
-    private fun resolveToken(request: HttpServletRequest): String? {
-        val bearerToken = request.getHeader(AUTHORIZATION_HEADER)
-        if (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(BEARER_PREFIX.length)
-        }
-        return null
-    }
-
     companion object {
-        private const val AUTHORIZATION_HEADER = "Authorization"
-        private const val BEARER_PREFIX = "Bearer "
         private const val USER_ID_HEADER = "X-User-Id"
         const val USER_ID_ATTRIBUTE = "userId"
     }

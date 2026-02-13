@@ -2,7 +2,6 @@ package me.suhyun.soj.domain.admin.application.service
 
 import me.suhyun.soj.domain.admin.exception.AdminErrorCode
 import me.suhyun.soj.domain.admin.presentation.request.AdminLoginRequest
-import me.suhyun.soj.domain.admin.presentation.response.AdminLoginResponse
 import me.suhyun.soj.domain.user.application.service.UserService
 import me.suhyun.soj.domain.user.domain.model.enums.UserRole
 import me.suhyun.soj.global.exception.BusinessException
@@ -17,7 +16,7 @@ class AdminAuthService(
     private val passwordEncoder: PasswordEncoder
 ) {
 
-    fun login(request: AdminLoginRequest): AdminLoginResponse {
+    fun login(request: AdminLoginRequest): Pair<String, String> {
         val user = userService.findByEmail(request.email)
             ?: throw BusinessException(AdminErrorCode.INVALID_CREDENTIALS)
 
@@ -32,9 +31,6 @@ class AdminAuthService(
         val accessToken = jwtTokenProvider.createAccessToken(user)
         val refreshToken = jwtTokenProvider.createRefreshToken(user)
 
-        return AdminLoginResponse(
-            accessToken = accessToken,
-            refreshToken = refreshToken
-        )
+        return accessToken to refreshToken
     }
 }
