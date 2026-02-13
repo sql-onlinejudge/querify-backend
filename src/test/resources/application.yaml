@@ -23,6 +23,14 @@ spring:
     listener:
       auto-startup: false
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+
   flyway:
     enabled: false
 
@@ -66,6 +74,9 @@ notification:
   discord:
     webhook-url:
     error-webhook-url:
+
+oauth:
+  redirect-url: http://localhost:3000/oauth/callback
 
 logging:
   level:
