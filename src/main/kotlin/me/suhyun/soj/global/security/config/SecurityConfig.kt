@@ -25,6 +25,7 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
+import org.slf4j.LoggerFactory
 
 @Configuration
 @EnableWebSecurity
@@ -56,8 +57,21 @@ class SecurityConfig(
     }
 
     @Bean
-    fun corsFilterRegistration(): FilterRegistrationBean<CorsFilter> {
-        val bean = FilterRegistrationBean(CorsFilter(corsConfigurationSource()))
+    fun corsFilterRegistration(): FilterRegistrationBean<*> {
+        val log = LoggerFactory.getLogger("CorsDebug")
+        val source = corsConfigurationSource()
+        log.warn("CORS allowed origins: {}", allowedOrigins)
+        val bean = FilterRegistrationBean(object : CorsFilter(source) {
+            override fun doFilterInternal(
+                request: jakarta.servlet.http.HttpServletRequest,
+                response: jakarta.servlet.http.HttpServletResponse,
+                filterChain: jakarta.servlet.FilterChain
+            ) {
+                log.warn("CORS filter hit: {} {} Origin={}", request.method, request.requestURI, request.getHeader("Origin"))
+                super.doFilterInternal(request, response, filterChain)
+                log.warn("CORS filter done: {} status={}", request.requestURI, response.status)
+            }
+        })
         bean.order = Ordered.HIGHEST_PRECEDENCE
         return bean
     }
