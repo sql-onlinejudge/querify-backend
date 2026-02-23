@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.util.UUID
@@ -168,5 +169,11 @@ class SubmissionRepositoryImpl : SubmissionRepository {
             .limit(limit)
             .map { SubmissionEntity.wrapRow(it) }
             .map { Submission.from(it) }
+    }
+
+    override fun migrateUserId(fromUserId: UUID, toUserId: UUID): Int {
+        return SubmissionTable.update({ SubmissionTable.userId eq fromUserId.toString() }) {
+            it[userId] = toUserId.toString()
+        }
     }
 }

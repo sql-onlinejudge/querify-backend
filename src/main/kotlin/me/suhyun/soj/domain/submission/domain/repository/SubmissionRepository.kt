@@ -24,4 +24,5 @@ interface SubmissionRepository {
     fun countByStatus(status: SubmissionStatus): Long
     fun countByDateGrouped(startDate: LocalDateTime, endDate: LocalDateTime): List<DailySubmissionCount>
     fun findRecent(limit: Int): List<Submission>
+    fun migrateUserId(fromUserId: UUID, toUserId: UUID): Int
 }

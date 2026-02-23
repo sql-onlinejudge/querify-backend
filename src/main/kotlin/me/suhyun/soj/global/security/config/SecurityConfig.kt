@@ -76,6 +76,7 @@ class SecurityConfig(
                 auth.requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/problems/**").permitAll()
                 auth.requestMatchers(HttpMethod.POST, "/problems/*/submissions").permitAll()
+                auth.requestMatchers(HttpMethod.POST, "/auth/merge-guest").authenticated()
                 auth.requestMatchers("/admin/**").authenticated()
                 auth.anyRequest().permitAll()
             }
