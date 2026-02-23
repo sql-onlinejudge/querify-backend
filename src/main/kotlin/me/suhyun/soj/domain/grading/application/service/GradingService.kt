@@ -36,7 +36,7 @@ class GradingService(
         val problem = problemRepository.findById(submission.problemId)
             ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
 
-        val testCases = testCaseRepository.findAllByProblemId(problem.id!!)
+        val testCases = testCaseRepository.findAllByProblemId(problem.id!!, null)
 
         submissionRepository.updateStatus(submissionId, SubmissionStatus.RUNNING, null)
         sseEmitterService.send(submissionId, SubmissionStatus.RUNNING, null)
