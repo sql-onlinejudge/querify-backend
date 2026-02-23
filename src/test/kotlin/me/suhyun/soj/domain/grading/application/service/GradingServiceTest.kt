@@ -138,7 +138,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             whenever(queryExecutor.execute(any(), any(), any(), any())).thenReturn("1\tAlice")
             whenever(resultComparator.compare(any(), any(), any())).thenReturn(true)
@@ -156,7 +156,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             whenever(queryExecutor.execute(any(), any(), any(), any())).thenReturn("wrong")
             whenever(resultComparator.compare(any(), any(), any())).thenReturn(false)
@@ -174,7 +174,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             whenever(queryExecutor.execute(any(), any(), any(), any()))
                 .thenThrow(QueryTimeoutException("timeout"))
@@ -192,7 +192,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             whenever(queryExecutor.execute(any(), any(), any(), any()))
                 .thenThrow(QueryExecutionException("SQL error"))
@@ -210,7 +210,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             whenever(queryExecutor.execute(any(), any(), any(), any())).thenReturn("1\tAlice")
             whenever(resultComparator.compare(any(), any(), any())).thenReturn(true)
@@ -230,7 +230,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             whenever(queryExecutor.execute(any(), any(), any(), any())).thenReturn("1\tAlice")
             whenever(resultComparator.compare(any(), any(), any())).thenReturn(true)
@@ -264,7 +264,7 @@ class GradingServiceTest {
 
             whenever(submissionRepository.findById(submissionId)).thenReturn(submission)
             whenever(problemRepository.findById(problemId)).thenReturn(problem)
-            whenever(testCaseRepository.findAllByProblemId(problemId)).thenReturn(testCases)
+            whenever(testCaseRepository.findAllByProblemId(problemId, null)).thenReturn(testCases)
             whenever(submissionRepository.updateStatus(any(), any(), any())).thenReturn(true)
             doThrow(BusinessException(GradingErrorCode.FORBIDDEN_SQL_STATEMENT))
                 .whenever(queryValidator).validate(any())
