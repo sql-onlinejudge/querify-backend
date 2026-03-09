@@ -21,7 +21,7 @@ import javax.crypto.SecretKey
 class JwtTokenProvider(
     private val jwtProperties: JwtProperties
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(this::class.java)
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
     fun createAccessToken(user: User): String {

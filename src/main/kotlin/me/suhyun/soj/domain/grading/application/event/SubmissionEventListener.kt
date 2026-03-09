@@ -15,7 +15,7 @@ class SubmissionEventListener(
     private val gradingKafkaProducer: GradingKafkaProducer,
     private val notifier: Notifier,
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handleSubmissionCreated(event: SubmissionCreatedEvent) {
