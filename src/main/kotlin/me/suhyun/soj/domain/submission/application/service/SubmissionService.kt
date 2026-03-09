@@ -12,6 +12,7 @@ import me.suhyun.soj.domain.submission.presentation.response.SubmissionResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import me.suhyun.soj.global.exception.BusinessException
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -22,7 +23,8 @@ import java.util.UUID
 class SubmissionService(
     private val submissionRepository: SubmissionRepository,
     private val problemRepository: ProblemRepository,
-    private val eventPublisher: ApplicationEventPublisher
+    private val eventPublisher: ApplicationEventPublisher,
+    private val redisTemplate: StringRedisTemplate
 ) {
 
     fun submit(problemId: Long, userId: UUID, request: SubmitRequest): Long {
@@ -40,7 +42,7 @@ class SubmissionService(
             )
         )
 
-        problemRepository.incrementSubmittedCount(problemId)
+        redisTemplate.opsForValue().increment("problem:submissionCount:$problemId")
         eventPublisher.publishEvent(SubmissionCreatedEvent(saved.id!!, saved.query))
 
         return saved.id
