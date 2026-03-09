@@ -17,7 +17,9 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.mockito.Answers
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -33,6 +35,9 @@ class SubmissionServiceSubmitTest {
     @Mock
     private lateinit var eventPublisher: ApplicationEventPublisher
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private lateinit var redisTemplate: StringRedisTemplate
+
     @Captor
     private lateinit var submissionCaptor: ArgumentCaptor<Submission>
 
@@ -43,7 +48,7 @@ class SubmissionServiceSubmitTest {
 
     @BeforeEach
     fun setUp() {
-        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher)
+        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate)
     }
 
     @Test

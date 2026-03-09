@@ -12,6 +12,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -27,11 +28,14 @@ class SubmissionServiceFindAllByProblemIdTest {
     @Mock
     private lateinit var eventPublisher: ApplicationEventPublisher
 
+    @Mock
+    private lateinit var redisTemplate: StringRedisTemplate
+
     private lateinit var submissionService: SubmissionService
 
     @BeforeEach
     fun setUp() {
-        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher)
+        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate)
     }
 
     private fun createSubmission(
