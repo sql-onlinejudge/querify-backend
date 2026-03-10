@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 class SubmissionScheduler(
     private val redisTemplate: StringRedisTemplate
 ) {
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 60000)
     @Transactional
     fun syncSubmissionCounts() {
         val keys = redisTemplate.keys("problem:submissionCount:*") ?: return
