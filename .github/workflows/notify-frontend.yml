@@ -17,9 +17,7 @@ jobs:
         run: |
           DIFF=$(git diff HEAD~1 HEAD)
           MSG=$(git log -1 --pretty=%B)
-          curl -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/sql-onlinejudge/soj-frontend/dispatches \
-            -d "$(jq -n --arg diff "$DIFF" --arg msg "$MSG" \
-              '{event_type: "backend-updated", client_payload: {diff: $diff, commit_message: $msg}}')"
+          gh api repos/sql-onlinejudge/soj-frontend/dispatches \
+            -f event_type="backend-updated" \
+            -f "client_payload[diff]=$DIFF" \
+            -f "client_payload[commit_message]=$MSG"
