@@ -1,4 +1,4 @@
-package me.suhyun.soj.domain.problem.presentation.api
+package me.suhyun.soj.domain.admin.presentation
 
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.infrastructure.elasticsearch.ProblemDocument
