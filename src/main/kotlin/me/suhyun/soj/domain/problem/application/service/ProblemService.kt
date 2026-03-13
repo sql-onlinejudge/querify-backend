@@ -85,7 +85,7 @@ class ProblemService(
         maxDifficulty: Int?,
         keyword: String?,
         sort: List<String>,
-        userId: UUID,
+        userId: UUID?,
         trialStatus: TrialStatus? = null
     ): PageResponse<ProblemResponse> {
         val problems: List<Problem>
@@ -120,7 +120,7 @@ class ProblemService(
         }
 
         val problemIds = problems.mapNotNull { it.id }
-        val trialStatuses = getTrialStatuses(problemIds, userId)
+        val trialStatuses = if (userId != null) getTrialStatuses(problemIds, userId) else emptyMap()
 
         return PageResponse.of(
             content = problems.map { ProblemResponse.from(it, trialStatuses[it.id]) },

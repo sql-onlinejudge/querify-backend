@@ -9,13 +9,13 @@ import me.suhyun.soj.domain.problem.presentation.response.ProblemDetailResponse
 import me.suhyun.soj.domain.problem.presentation.response.ProblemResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -38,15 +38,16 @@ class ProblemController(
 
     @GetMapping
     fun findAll(
+        authentication: Authentication?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @RequestParam(required = false) minDifficulty: Int?,
         @RequestParam(required = false) maxDifficulty: Int?,
         @RequestParam(required = false) keyword: String?,
         @RequestParam(defaultValue = "id:desc") sort: List<String>,
-        @RequestParam(required = false) trialStatus: TrialStatus?,
-        @RequestHeader("X-User-Id") userId: String
+        @RequestParam(required = false) trialStatus: TrialStatus?
     ): PageResponse<ProblemResponse> {
+        val userId = authentication?.principal as? UUID
         return problemService.findAll(
             page = page,
             size = size,
@@ -54,17 +55,18 @@ class ProblemController(
             maxDifficulty = maxDifficulty,
             keyword = keyword,
             sort = sort,
-            userId = UUID.fromString(userId),
+            userId = userId,
             trialStatus = trialStatus
         )
     }
 
     @GetMapping("/{problemId}")
     fun findById(
-        @PathVariable problemId: Long,
-        @RequestHeader(value = "X-User-Id", required = false) userId: String?
+        authentication: Authentication?,
+        @PathVariable problemId: Long
     ): ProblemDetailResponse {
-        return problemService.findById(problemId, userId?.let { UUID.fromString(it) })
+        val userId = authentication?.principal as? UUID
+        return problemService.findById(problemId, userId)
     }
 
     @PatchMapping("/{problemId}")

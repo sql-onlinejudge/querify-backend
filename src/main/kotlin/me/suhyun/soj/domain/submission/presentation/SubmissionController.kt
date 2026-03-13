@@ -8,11 +8,11 @@ import me.suhyun.soj.domain.submission.presentation.response.SubmissionResponse
 import me.suhyun.soj.domain.submission.presentation.response.SubmitResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -28,23 +28,25 @@ class SubmissionController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun submit(
+        authentication: Authentication,
         @PathVariable problemId: Long,
-        @RequestHeader("X-User-Id") userId: String,
         @Valid @RequestBody request: SubmitRequest
     ): SubmitResponse {
-        val submissionId = submissionService.submit(problemId, UUID.fromString(userId), request)
+        val userId = authentication.principal as UUID
+        val submissionId = submissionService.submit(problemId, userId, request)
         return SubmitResponse(submissionId)
     }
 
     @GetMapping
     fun findAll(
+        authentication: Authentication?,
         @PathVariable problemId: Long,
-        @RequestHeader(value = "X-User-Id", required = false) userId: String?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): PageResponse<SubmissionResponse> {
+        val userId = authentication?.principal as? UUID
         return if (userId != null) {
-            submissionService.findMyByProblemId(problemId, UUID.fromString(userId), page, size)
+            submissionService.findMyByProblemId(problemId, userId, page, size)
         } else {
             submissionService.findAllByProblemId(problemId, page, size)
         }
