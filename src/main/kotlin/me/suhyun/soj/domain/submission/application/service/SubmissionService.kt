@@ -11,6 +11,8 @@ import me.suhyun.soj.domain.submission.presentation.response.SubmissionDetailRes
 import me.suhyun.soj.domain.submission.presentation.response.SubmissionResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import me.suhyun.soj.global.exception.BusinessException
+import me.suhyun.soj.global.log.event.EventLogService
+import me.suhyun.soj.global.log.event.EventType
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.core.context.SecurityContextHolder
@@ -25,7 +27,8 @@ class SubmissionService(
     private val submissionRepository: SubmissionRepository,
     private val problemRepository: ProblemRepository,
     private val eventPublisher: ApplicationEventPublisher,
-    private val redisTemplate: StringRedisTemplate
+    private val redisTemplate: StringRedisTemplate,
+    private val eventLogService: EventLogService
 ) {
 
     fun submit(problemId: Long, request: SubmitRequest): Long {
@@ -46,6 +49,11 @@ class SubmissionService(
 
         redisTemplate.opsForValue().increment("problem:submissionCount:$problemId")
         eventPublisher.publishEvent(SubmissionCreatedEvent(saved.id!!, saved.query))
+        eventLogService.log(
+            userId = userId.toString(),
+            eventType = EventType.SUBMISSION_CREATE,
+            targetId = problemId.toString()
+        )
 
         return saved.id
     }

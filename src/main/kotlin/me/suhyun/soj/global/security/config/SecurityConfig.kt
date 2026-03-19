@@ -79,6 +79,7 @@ class SecurityConfig(
                 auth.requestMatchers(HttpMethod.POST, "/problems").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.PATCH, "/problems/*").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.DELETE, "/problems/*").hasRole("ADMIN")
+                auth.requestMatchers(HttpMethod.POST, "/events").permitAll()
                 auth.requestMatchers(HttpMethod.POST, "/problems/*/submissions").authenticated()
                 auth.requestMatchers(HttpMethod.POST, "/problems/*/test-cases").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.PATCH, "/problems/*/test-cases/*").hasRole("ADMIN")

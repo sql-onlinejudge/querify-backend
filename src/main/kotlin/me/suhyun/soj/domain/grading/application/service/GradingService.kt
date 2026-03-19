@@ -16,6 +16,8 @@ import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
 import me.suhyun.soj.domain.submission.exception.SubmissionErrorCode
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.global.exception.BusinessException
+import me.suhyun.soj.global.log.event.EventLogService
+import me.suhyun.soj.global.log.event.EventType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,7 +32,8 @@ class GradingService(
     private val queryValidator: QueryValidator,
     private val resultComparator: ResultComparator,
     private val sseEmitterService: SseEmitterService,
-    private val meterRegistry: MeterRegistry
+    private val meterRegistry: MeterRegistry,
+    private val eventLogService: EventLogService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -107,6 +110,12 @@ class GradingService(
         sseEmitterService.send(submissionId, SubmissionStatus.COMPLETED, verdict)
 
         if (verdict == SubmissionVerdict.ACCEPTED) {
+            eventLogService.log(
+                userId = submission.userId.toString(),
+                eventType = EventType.PROBLEM_SOLVED,
+                targetId = submission.problemId.toString(),
+                metadata = mapOf("submissionId" to submissionId)
+            )
             problemRepository.incrementSolvedCount(submission.problemId)
         }
 
