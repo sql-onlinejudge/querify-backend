@@ -11,7 +11,6 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.javatime.date
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
@@ -100,13 +99,10 @@ class SubmissionRepositoryImpl : SubmissionRepository {
     override fun getTrialStatuses(problemIds: List<Long>, userId: UUID): Map<Long, Boolean> {
         if (problemIds.isEmpty()) return emptyMap()
 
-        return SubmissionTable
-            .select(SubmissionTable.problemId, SubmissionTable.verdict)
-            .where {
-                SubmissionTable.deletedAt.isNull() and
-                (SubmissionTable.problemId inList problemIds) and
-                (SubmissionTable.userId eq userId.toString())
-            }
+        return SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .andWhere { SubmissionTable.problemId inList problemIds }
+            .andWhere { SubmissionTable.userId eq userId.toString() }
             .groupBy({ it[SubmissionTable.problemId] }) { it[SubmissionTable.verdict] }
             .mapValues { (_, verdicts) -> verdicts.any { it == SubmissionVerdict.ACCEPTED } }
     }
@@ -114,13 +110,10 @@ class SubmissionRepositoryImpl : SubmissionRepository {
     override fun getTrialStatus(problemId: Long, userId: UUID?): TrialStatus {
         if (userId == null) return TrialStatus.NOT_ATTEMPTED
 
-        val verdicts = SubmissionTable
-            .select(SubmissionTable.verdict)
-            .where {
-                SubmissionTable.deletedAt.isNull() and
-                (SubmissionTable.problemId eq problemId) and
-                (SubmissionTable.userId eq userId.toString())
-            }
+        val verdicts = SubmissionTable.selectAll()
+            .andWhere { SubmissionTable.deletedAt.isNull() }
+            .andWhere { SubmissionTable.problemId eq problemId }
+            .andWhere { SubmissionTable.userId eq userId.toString() }
             .map { it[SubmissionTable.verdict] }
 
         if (verdicts.isEmpty()) return TrialStatus.NOT_ATTEMPTED
