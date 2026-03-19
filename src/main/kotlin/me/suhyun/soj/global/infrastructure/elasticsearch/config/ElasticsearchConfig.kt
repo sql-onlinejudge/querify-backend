@@ -4,5 +4,5 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = ["me.suhyun.soj.domain.*.infrastructure.elasticsearch"])
+@EnableElasticsearchRepositories(basePackages = ["me.suhyun.soj.domain.*.infrastructure.elasticsearch", "me.suhyun.soj.global.log.event"])
 class ElasticsearchConfig
