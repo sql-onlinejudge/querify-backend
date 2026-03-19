@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.javatime.date
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
@@ -99,27 +100,31 @@ class SubmissionRepositoryImpl : SubmissionRepository {
     override fun getTrialStatuses(problemIds: List<Long>, userId: UUID): Map<Long, Boolean> {
         if (problemIds.isEmpty()) return emptyMap()
 
-        val submissions = SubmissionTable.selectAll()
-            .andWhere { SubmissionTable.deletedAt.isNull() }
-            .andWhere { SubmissionTable.problemId inList problemIds }
-            .andWhere { SubmissionTable.userId eq userId.toString() }
-            .map { SubmissionEntity.wrapRow(it) }
-
-        return submissions.groupBy { it.problemId }
-            .mapValues { (_, subs) -> subs.any { it.verdict == SubmissionVerdict.ACCEPTED } }
+        return SubmissionTable
+            .select(SubmissionTable.problemId, SubmissionTable.verdict)
+            .where {
+                SubmissionTable.deletedAt.isNull() and
+                (SubmissionTable.problemId inList problemIds) and
+                (SubmissionTable.userId eq userId.toString())
+            }
+            .groupBy({ it[SubmissionTable.problemId] }) { it[SubmissionTable.verdict] }
+            .mapValues { (_, verdicts) -> verdicts.any { it == SubmissionVerdict.ACCEPTED } }
     }
 
     override fun getTrialStatus(problemId: Long, userId: UUID?): TrialStatus {
         if (userId == null) return TrialStatus.NOT_ATTEMPTED
 
-        val submissions = SubmissionTable.selectAll()
-            .andWhere { SubmissionTable.deletedAt.isNull() }
-            .andWhere { SubmissionTable.problemId eq problemId }
-            .andWhere { SubmissionTable.userId eq userId.toString() }
-            .map { SubmissionEntity.wrapRow(it) }
+        val verdicts = SubmissionTable
+            .select(SubmissionTable.verdict)
+            .where {
+                SubmissionTable.deletedAt.isNull() and
+                (SubmissionTable.problemId eq problemId) and
+                (SubmissionTable.userId eq userId.toString())
+            }
+            .map { it[SubmissionTable.verdict] }
 
-        if (submissions.isEmpty()) return TrialStatus.NOT_ATTEMPTED
-        if (submissions.any { it.verdict == SubmissionVerdict.ACCEPTED }) return TrialStatus.SOLVED
+        if (verdicts.isEmpty()) return TrialStatus.NOT_ATTEMPTED
+        if (verdicts.any { it == SubmissionVerdict.ACCEPTED }) return TrialStatus.SOLVED
         return TrialStatus.ATTEMPTED
     }
 
