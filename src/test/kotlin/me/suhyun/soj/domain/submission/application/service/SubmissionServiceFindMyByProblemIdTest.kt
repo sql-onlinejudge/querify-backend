@@ -13,6 +13,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.context.ApplicationEventPublisher
+import me.suhyun.soj.global.log.event.EventLogService
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -35,13 +36,16 @@ class SubmissionServiceFindMyByProblemIdTest {
     @Mock
     private lateinit var redisTemplate: StringRedisTemplate
 
+    @Mock
+    private lateinit var eventLogService: EventLogService
+
     private lateinit var submissionService: SubmissionService
 
     private val userId = UUID.randomUUID()
 
     @BeforeEach
     fun setUp() {
-        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate)
+        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate, eventLogService)
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken(userId, null, listOf(SimpleGrantedAuthority("ROLE_USER")))
     }

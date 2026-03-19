@@ -20,6 +20,7 @@ import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.mockito.Answers
 import org.springframework.context.ApplicationEventPublisher
+import me.suhyun.soj.global.log.event.EventLogService
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -42,6 +43,9 @@ class SubmissionServiceSubmitTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private lateinit var redisTemplate: StringRedisTemplate
 
+    @Mock
+    private lateinit var eventLogService: EventLogService
+
     @Captor
     private lateinit var submissionCaptor: ArgumentCaptor<Submission>
 
@@ -54,7 +58,7 @@ class SubmissionServiceSubmitTest {
 
     @BeforeEach
     fun setUp() {
-        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate)
+        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate, eventLogService)
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken(userId, null, listOf(SimpleGrantedAuthority("ROLE_USER")))
     }

@@ -19,6 +19,7 @@ import me.suhyun.soj.domain.submission.exception.SubmissionErrorCode
 import me.suhyun.soj.domain.testcase.domain.model.TestCase
 import me.suhyun.soj.domain.testcase.domain.repository.TestCaseRepository
 import me.suhyun.soj.global.exception.BusinessException
+import me.suhyun.soj.global.log.event.EventLogService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -66,6 +67,9 @@ class GradingServiceTest {
 
     private val meterRegistry: MeterRegistry = SimpleMeterRegistry()
 
+    @Mock
+    private lateinit var eventLogService: EventLogService
+
     private lateinit var gradingService: GradingService
 
     private val submissionId = 1L
@@ -82,7 +86,8 @@ class GradingServiceTest {
             queryValidator,
             resultComparator,
             sseEmitterService,
-            meterRegistry
+            meterRegistry,
+            eventLogService
         )
     }
 

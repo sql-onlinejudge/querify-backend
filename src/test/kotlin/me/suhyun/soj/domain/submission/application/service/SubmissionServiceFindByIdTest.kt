@@ -15,6 +15,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.context.ApplicationEventPublisher
+import me.suhyun.soj.global.log.event.EventLogService
 import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -34,11 +35,14 @@ class SubmissionServiceFindByIdTest {
     @Mock
     private lateinit var redisTemplate: StringRedisTemplate
 
+    @Mock
+    private lateinit var eventLogService: EventLogService
+
     private lateinit var submissionService: SubmissionService
 
     @BeforeEach
     fun setUp() {
-        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate)
+        submissionService = SubmissionService(submissionRepository, problemRepository, eventPublisher, redisTemplate, eventLogService)
     }
 
     @Test
