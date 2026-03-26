@@ -1,7 +1,6 @@
 package me.suhyun.soj.domain.problem.domain.repository
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
-import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import java.util.UUID
 
@@ -30,7 +29,6 @@ interface ProblemRepository {
         title: String?,
         description: String?,
         schemaSql: String?,
-        schemaMetadata: SchemaMetadata?,
         difficulty: Int?,
         timeLimit: Int?,
         isOrderSensitive: Boolean?
