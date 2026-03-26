@@ -31,7 +31,7 @@ class MetadataMigrationConfig(
         ).forEach { row ->
             val schemaMetadata = objectMapper.readValue(row["schema_metadata"] as String, SchemaMetadata::class.java)
             val doc = Document()
-                .append("problemId", row["id"] as Long)
+                .append("problemId", (row["id"] as Number).toLong())
                 .append("schemaMetadata", objectMapper.convertValue(schemaMetadata, Map::class.java))
             mongoTemplate.insert(doc, "problem_metadata")
         }
@@ -39,7 +39,7 @@ class MetadataMigrationConfig(
         jdbcTemplate.queryForList(
             "SELECT id, init_metadata, answer_metadata FROM test_cases WHERE (init_metadata IS NOT NULL OR answer_metadata IS NOT NULL) AND deleted_at IS NULL"
         ).forEach { row ->
-            val doc = Document().append("testCaseId", row["id"] as Long)
+            val doc = Document().append("testCaseId", (row["id"] as Number).toLong())
             (row["init_metadata"] as? String)?.let {
                 val initMetadata = objectMapper.readValue(it, InitMetadata::class.java)
                 doc.append("initMetadata", objectMapper.convertValue(initMetadata, Map::class.java))
