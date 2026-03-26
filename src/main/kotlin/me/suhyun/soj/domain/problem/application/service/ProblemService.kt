@@ -6,6 +6,10 @@ import me.suhyun.soj.domain.problem.domain.model.Problem
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
+import me.suhyun.soj.domain.problem.infrastructure.mongo.ProblemMetadataDocument
+import me.suhyun.soj.domain.problem.infrastructure.mongo.ProblemMetadataMongoRepository
+import me.suhyun.soj.domain.testcase.infrastructure.mongo.TestCaseMetadataDocument
+import me.suhyun.soj.domain.testcase.infrastructure.mongo.TestCaseMetadataMongoRepository
 import me.suhyun.soj.domain.problem.presentation.request.CreateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.request.UpdateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.response.ProblemDetailResponse
@@ -34,7 +38,9 @@ class ProblemService(
     private val cacheService: CacheService,
     private val cacheProperties: CacheProperties,
     private val problemEventPublisher: ProblemEventPublisher,
-    private val problemSearchService: me.suhyun.soj.domain.problem.infrastructure.elasticsearch.ProblemSearchService
+    private val problemSearchService: me.suhyun.soj.domain.problem.infrastructure.elasticsearch.ProblemSearchService,
+    private val problemMetadataMongoRepository: ProblemMetadataMongoRepository,
+    private val testCaseMetadataMongoRepository: TestCaseMetadataMongoRepository
 ) {
 
     fun create(request: CreateProblemRequest) {
@@ -45,7 +51,7 @@ class ProblemService(
                 title = request.title,
                 description = request.description,
                 schemaSql = schemaSql,
-                schemaMetadata = request.schemaMetadata,
+                schemaMetadata = null,
                 difficulty = request.difficulty,
                 timeLimit = request.timeLimit,
                 isOrderSensitive = request.isOrderSensitive,
@@ -57,25 +63,36 @@ class ProblemService(
             )
         )
 
+        problemMetadataMongoRepository.save(
+            ProblemMetadataDocument(problemId = savedProblem.id!!, schemaMetadata = request.schemaMetadata)
+        )
+
         request.testcases.forEach { input ->
             val initSql = input.initData?.let { SqlGenerator.generateInit(it) }
             val answer = SqlGenerator.generateAnswer(input.answerData)
-            testCaseRepository.save(
+            val savedTestCase = testCaseRepository.save(
                 TestCase(
                     id = null,
-                    problemId = savedProblem.id!!,
+                    problemId = savedProblem.id,
                     initSql = initSql,
-                    initMetadata = input.initData,
+                    initMetadata = null,
                     answer = answer,
-                    answerMetadata = input.answerData,
+                    answerMetadata = null,
                     createdAt = LocalDateTime.now(),
                     updatedAt = null,
                     deletedAt = null
                 )
             )
+            testCaseMetadataMongoRepository.save(
+                TestCaseMetadataDocument(
+                    testCaseId = savedTestCase.id!!,
+                    initMetadata = input.initData,
+                    answerMetadata = input.answerData
+                )
+            )
         }
 
-        problemEventPublisher.publish(ProblemEvent.Created(savedProblem.id!!))
+        problemEventPublisher.publish(ProblemEvent.Created(savedProblem.id))
     }
 
     @Transactional(readOnly = true)
@@ -135,8 +152,14 @@ class ProblemService(
     fun findById(problemId: Long): ProblemDetailResponse {
         val userId = SecurityContextHolder.getContext().authentication?.principal as? UUID
         val problem = getCachedProblem(problemId)
-            ?: problemRepository.findById(problemId)?.also { cacheProblem(it) }
-            ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+            ?: run {
+                val loaded = problemRepository.findById(problemId)
+                    ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+                val schemaMetadata = problemMetadataMongoRepository.findByProblemId(problemId)?.schemaMetadata
+                val enriched = loaded.copy(schemaMetadata = schemaMetadata)
+                cacheProblem(enriched)
+                enriched
+            }
         val trialStatus = getTrialStatus(problemId, userId)
         return ProblemDetailResponse.from(problem, trialStatus)
     }
@@ -158,11 +181,20 @@ class ProblemService(
             title = request.title,
             description = request.description,
             schemaSql = schemaSql,
-            schemaMetadata = request.schemaMetadata,
             difficulty = request.difficulty,
             timeLimit = request.timeLimit,
             isOrderSensitive = request.isOrderSensitive
         ) ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
+
+        request.schemaMetadata?.let { metadata ->
+            val existing = problemMetadataMongoRepository.findByProblemId(problemId)
+            if (existing != null) {
+                problemMetadataMongoRepository.save(existing.copy(schemaMetadata = metadata))
+            } else {
+                problemMetadataMongoRepository.save(ProblemMetadataDocument(problemId = problemId, schemaMetadata = metadata))
+            }
+        }
+
         cacheService.evict(CacheKeys.Problem.byId(problemId))
         problemEventPublisher.publish(ProblemEvent.Updated(problemId))
     }
@@ -172,6 +204,9 @@ class ProblemService(
         if (!deleted) {
             throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
         }
+        val testCaseIds = testCaseRepository.findAllByProblemId(problemId, null).mapNotNull { it.id }
+        testCaseMetadataMongoRepository.deleteAllByTestCaseIdIn(testCaseIds)
+        problemMetadataMongoRepository.deleteByProblemId(problemId)
         cacheService.evict(CacheKeys.Problem.byId(problemId))
         problemEventPublisher.publish(ProblemEvent.Deleted(problemId))
     }

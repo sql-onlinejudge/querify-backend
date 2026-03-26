@@ -24,7 +24,7 @@ data class Problem(
             title = entity.title,
             description = entity.description,
             schemaSql = entity.schemaSql,
-            schemaMetadata = entity.schemaMetadata,
+            schemaMetadata = null,
             difficulty = entity.difficulty,
             timeLimit = entity.timeLimit,
             isOrderSensitive = entity.isOrderSensitive,
