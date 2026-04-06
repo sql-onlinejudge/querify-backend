@@ -1,6 +1,7 @@
 package me.suhyun.soj.domain.testcase.application.service
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
 import me.suhyun.soj.domain.testcase.domain.model.AnswerMetadata
@@ -65,6 +66,7 @@ class TestCaseServiceCreateTest {
             isOrderSensitive = false,
             solvedCount = 0,
             submissionCount = 0,
+            category = ProblemCategory.SQL,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null

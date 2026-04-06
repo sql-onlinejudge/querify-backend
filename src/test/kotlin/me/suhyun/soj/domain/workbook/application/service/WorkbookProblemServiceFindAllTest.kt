@@ -1,6 +1,7 @@
 package me.suhyun.soj.domain.workbook.application.service
 
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
@@ -95,6 +96,7 @@ class WorkbookProblemServiceFindAllTest {
             isOrderSensitive = false,
             solvedCount = 0,
             submissionCount = 0,
+            category = ProblemCategory.SQL,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null

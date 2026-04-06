@@ -9,6 +9,7 @@ import me.suhyun.soj.domain.grading.infrastructure.QueryExecutor
 import me.suhyun.soj.domain.grading.infrastructure.QueryValidator
 import me.suhyun.soj.domain.grading.infrastructure.sse.SseEmitterService
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
 import me.suhyun.soj.domain.submission.domain.model.Submission
@@ -117,6 +118,7 @@ class GradingServiceTest {
             isOrderSensitive = true,
             solvedCount = 0,
             submissionCount = 0,
+            category = ProblemCategory.SQL,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null
