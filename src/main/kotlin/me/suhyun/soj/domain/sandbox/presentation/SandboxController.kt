@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.sandbox.presentation
 
+import me.suhyun.soj.domain.sandbox.application.service.SandboxCloseService
 import me.suhyun.soj.domain.sandbox.application.service.SandboxQueryService
 import me.suhyun.soj.domain.sandbox.application.service.SandboxSetupService
 import me.suhyun.soj.domain.sandbox.presentation.request.SandboxQueryRequest
@@ -10,6 +11,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,7 +27,8 @@ import java.util.UUID
 @RequestMapping("/runs/sandbox")
 class SandboxController(
     private val sandboxSetupService: SandboxSetupService,
-    private val sandboxQueryService: SandboxQueryService
+    private val sandboxQueryService: SandboxQueryService,
+    private val sandboxCloseService: SandboxCloseService
 ) {
 
     @PostMapping("/setup", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
@@ -49,5 +52,18 @@ class SandboxController(
     fun getSession(@PathVariable sessionKey: String): SandboxSessionResponse {
         val userId = SecurityContextHolder.getContext().authentication?.principal as UUID
         return sandboxQueryService.getSession(sessionKey, userId)
+    }
+
+    @GetMapping
+    fun listSessions(): List<SandboxSessionResponse> {
+        val userId = SecurityContextHolder.getContext().authentication?.principal as UUID
+        return sandboxQueryService.listSessions(userId)
+    }
+
+    @DeleteMapping("/{sessionKey}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun closeSession(@PathVariable sessionKey: String) {
+        val userId = SecurityContextHolder.getContext().authentication?.principal as UUID
+        sandboxCloseService.close(sessionKey, userId)
     }
 }

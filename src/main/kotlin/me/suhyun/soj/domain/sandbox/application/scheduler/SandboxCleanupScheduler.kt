@@ -1,12 +1,12 @@
 package me.suhyun.soj.domain.sandbox.application.scheduler
 
+import me.suhyun.soj.domain.sandbox.domain.model.SandboxStatus
 import me.suhyun.soj.domain.sandbox.domain.repository.SandboxSessionRepository
 import me.suhyun.soj.domain.sandbox.infrastructure.SandboxSchemaManager
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Component
 class SandboxCleanupScheduler(
@@ -19,11 +19,12 @@ class SandboxCleanupScheduler(
     @Scheduled(fixedDelay = 600_000)
     @Transactional
     fun cleanupExpiredSessions() {
-        val expired = sandboxSessionRepository.findExpiredBefore(LocalDateTime.now())
+        val expired = sandboxSessionRepository.findExpiredActive()
         expired.forEach { session ->
-            sandboxSchemaManager.dropSchema(session.schemaName)
-            sandboxSessionRepository.softDelete(session.id!!)
-            log.info("Cleaned up expired sandbox session: {}", session.sessionKey)
+            runCatching { sandboxSchemaManager.dropSchema(session.schemaName) }
+                .onFailure { log.warn("Failed to drop schema for session {}: {}", session.sessionKey, it.message) }
+            sandboxSessionRepository.updateStatus(session.id!!, SandboxStatus.EXPIRED)
+            log.info("Expired sandbox session: {}", session.sessionKey)
         }
     }
 }

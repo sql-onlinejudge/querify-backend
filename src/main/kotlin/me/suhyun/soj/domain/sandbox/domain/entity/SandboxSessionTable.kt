@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.sandbox.domain.entity
 
+import me.suhyun.soj.domain.sandbox.domain.model.SandboxStatus
 import me.suhyun.soj.global.common.entity.BaseTable
 import org.jetbrains.exposed.sql.javatime.datetime
 
@@ -10,4 +11,5 @@ object SandboxSessionTable : BaseTable("sandbox_sessions") {
     val dbSchema = varchar("schema_name", 64)
     val extractedSql = text("extracted_sql")
     val expiresAt = datetime("expires_at")
+    val status = enumerationByName<SandboxStatus>("status", 10).default(SandboxStatus.ACTIVE)
 }

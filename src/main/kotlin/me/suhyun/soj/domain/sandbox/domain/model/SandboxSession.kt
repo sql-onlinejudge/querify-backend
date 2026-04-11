@@ -9,10 +9,11 @@ data class SandboxSession(
     val schemaName: String,
     val extractedSql: String,
     val expiresAt: LocalDateTime,
+    val status: SandboxStatus = SandboxStatus.ACTIVE,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime? = null,
     val deletedAt: LocalDateTime? = null
 ) {
-    fun isExpired(): Boolean = LocalDateTime.now().isAfter(expiresAt)
+    fun isActive(): Boolean = status == SandboxStatus.ACTIVE
     fun isOwnedBy(userId: String): Boolean = this.userId == userId
 }
