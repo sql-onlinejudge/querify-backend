@@ -9,6 +9,7 @@ enum class SandboxErrorCode(
 ) : ErrorCode {
     SANDBOX_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "샌드박스 세션을 찾을 수 없습니다"),
     SANDBOX_SESSION_EXPIRED(HttpStatus.GONE, "샌드박스 세션이 만료되었습니다"),
+    SANDBOX_SESSION_NOT_ACTIVE(HttpStatus.GONE, "이미 종료된 세션입니다"),
     SANDBOX_FORBIDDEN(HttpStatus.FORBIDDEN, "본인의 세션만 접근할 수 있습니다"),
     FORBIDDEN_SETUP_SQL(HttpStatus.BAD_REQUEST, "CREATE TABLE과 INSERT INTO만 허용됩니다"),
     OCR_EXTRACTION_FAILED(HttpStatus.UNPROCESSABLE_ENTITY, "이미지에서 SQL을 추출하지 못했습니다"),

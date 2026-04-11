@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.sandbox.presentation.response
 
+import me.suhyun.soj.domain.sandbox.domain.model.SandboxStatus
 import java.time.LocalDateTime
 
 data class SandboxSessionResponse(
@@ -7,5 +8,6 @@ data class SandboxSessionResponse(
     val schemaName: String,
     val extractedSql: String,
     val expiresAt: LocalDateTime,
-    val expired: Boolean
+    val status: SandboxStatus,
+    val createdAt: LocalDateTime
 )

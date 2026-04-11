@@ -25,7 +25,7 @@ class SandboxQueryService(
         val session = sandboxSessionRepository.findBySessionKey(sessionKey)
             ?: throw BusinessException(SandboxErrorCode.SANDBOX_SESSION_NOT_FOUND)
 
-        if (session.isExpired()) throw BusinessException(SandboxErrorCode.SANDBOX_SESSION_EXPIRED)
+        if (!session.isActive()) throw BusinessException(SandboxErrorCode.SANDBOX_SESSION_NOT_ACTIVE)
         if (!session.isOwnedBy(userId.toString())) throw BusinessException(SandboxErrorCode.SANDBOX_FORBIDDEN)
 
         sandboxSqlValidator.validateSelectQuery(query)
@@ -46,7 +46,22 @@ class SandboxQueryService(
             schemaName = session.schemaName,
             extractedSql = session.extractedSql,
             expiresAt = session.expiresAt,
-            expired = session.isExpired()
+            status = session.status,
+            createdAt = session.createdAt
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun listSessions(userId: UUID): List<SandboxSessionResponse> {
+        return sandboxSessionRepository.findByUserId(userId.toString()).map { session ->
+            SandboxSessionResponse(
+                sessionKey = session.sessionKey,
+                schemaName = session.schemaName,
+                extractedSql = session.extractedSql,
+                expiresAt = session.expiresAt,
+                status = session.status,
+                createdAt = session.createdAt
+            )
+        }
     }
 }
