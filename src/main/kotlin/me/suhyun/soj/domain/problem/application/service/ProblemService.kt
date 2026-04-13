@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.problem.application.service
 import me.suhyun.soj.domain.problem.application.event.ProblemEvent
 import me.suhyun.soj.domain.problem.application.event.ProblemEventPublisher
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.exception.ProblemErrorCode
@@ -104,7 +105,8 @@ class ProblemService(
         maxDifficulty: Int?,
         keyword: String?,
         sort: List<String>,
-        trialStatus: TrialStatus? = null
+        trialStatus: TrialStatus? = null,
+        category: ProblemCategory? = null
     ): PageResponse<ProblemResponse> {
         val userId = SecurityContextHolder.getContext().authentication?.principal as? UUID
         val problems: List<Problem>
@@ -118,7 +120,8 @@ class ProblemService(
                 maxDifficulty = maxDifficulty,
                 trialStatus = trialStatus,
                 userId = userId,
-                sort = sort
+                sort = sort,
+                category = category
             )
             totalElements = filteredProblems.size.toLong()
             problems = filteredProblems.drop(page * size).take(size)
@@ -131,10 +134,11 @@ class ProblemService(
                 keyword = null,
                 sort = sort,
                 trialStatus = trialStatus,
-                userId = userId
+                userId = userId,
+                category = category
             )
             totalElements = problemRepository.countAll(
-                minDifficulty, maxDifficulty, null, trialStatus, userId
+                minDifficulty, maxDifficulty, null, trialStatus, userId, category
             )
         }
 

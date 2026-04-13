@@ -52,9 +52,10 @@ class ProblemRepositoryImpl : ProblemRepository {
         keyword: String?,
         sort: List<String>,
         trialStatus: TrialStatus?,
-        userId: UUID?
+        userId: UUID?,
+        category: ProblemCategory?
     ): List<Problem> {
-        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword, trialStatus, userId)
+        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword, trialStatus, userId, category)
 
         val sortCriteria = parseSortCriteria(sort)
         sortCriteria.forEach { (column, order) ->
@@ -90,9 +91,10 @@ class ProblemRepositoryImpl : ProblemRepository {
         maxDifficulty: Int?,
         keyword: String?,
         trialStatus: TrialStatus?,
-        userId: UUID?
+        userId: UUID?,
+        category: ProblemCategory?
     ): Long {
-        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword, trialStatus, userId)
+        val query = buildFilteredQuery(minDifficulty, maxDifficulty, keyword, trialStatus, userId, category)
 
         return query.count()
     }
@@ -159,7 +161,8 @@ class ProblemRepositoryImpl : ProblemRepository {
         maxDifficulty: Int?,
         trialStatus: TrialStatus?,
         userId: UUID?,
-        sort: List<String>
+        sort: List<String>,
+        category: ProblemCategory?
     ): List<Problem> {
         if (ids.isEmpty()) return emptyList()
 
@@ -172,6 +175,10 @@ class ProblemRepositoryImpl : ProblemRepository {
 
         maxDifficulty?.let {
             query.andWhere { ProblemTable.difficulty lessEq it }
+        }
+
+        category?.let {
+            query.andWhere { ProblemTable.category eq it }
         }
 
         if (trialStatus != null && userId != null) {
@@ -215,7 +222,8 @@ class ProblemRepositoryImpl : ProblemRepository {
         maxDifficulty: Int?,
         keyword: String?,
         trialStatus: TrialStatus? = null,
-        userId: UUID? = null
+        userId: UUID? = null,
+        category: ProblemCategory? = null
     ): Query {
         val query = ProblemTable.selectAll()
             .andWhere { ProblemTable.deletedAt.isNull() }
@@ -226,6 +234,10 @@ class ProblemRepositoryImpl : ProblemRepository {
 
         maxDifficulty?.let {
             query.andWhere { ProblemTable.difficulty lessEq it }
+        }
+
+        category?.let {
+            query.andWhere { ProblemTable.category eq it }
         }
 
         keyword?.let { kw ->

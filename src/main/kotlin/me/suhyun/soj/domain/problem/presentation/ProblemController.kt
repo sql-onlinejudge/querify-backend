@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.problem.presentation
 import jakarta.validation.Valid
 import me.suhyun.soj.domain.problem.application.service.ProblemService
 import me.suhyun.soj.domain.problem.application.service.RecommendationService
+import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.presentation.request.CreateProblemRequest
 import me.suhyun.soj.domain.problem.presentation.request.RecommendationTrigger
@@ -46,7 +47,8 @@ class ProblemController(
         @RequestParam(required = false) maxDifficulty: Int?,
         @RequestParam(required = false) keyword: String?,
         @RequestParam(defaultValue = "id:desc") sort: List<String>,
-        @RequestParam(required = false) trialStatus: TrialStatus?
+        @RequestParam(required = false) trialStatus: TrialStatus?,
+        @RequestParam(required = false) category: ProblemCategory?
     ): PageResponse<ProblemResponse> {
         return problemService.findAll(
             page = page,
@@ -55,7 +57,8 @@ class ProblemController(
             maxDifficulty = maxDifficulty,
             keyword = keyword,
             sort = sort,
-            trialStatus = trialStatus
+            trialStatus = trialStatus,
+            category = category
         )
     }
 

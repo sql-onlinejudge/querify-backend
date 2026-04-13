@@ -16,14 +16,16 @@ interface ProblemRepository {
         keyword: String?,
         sort: List<String>,
         trialStatus: TrialStatus? = null,
-        userId: UUID? = null
+        userId: UUID? = null,
+        category: ProblemCategory? = null
     ): List<Problem>
     fun countAll(
         minDifficulty: Int?,
         maxDifficulty: Int?,
         keyword: String?,
         trialStatus: TrialStatus? = null,
-        userId: UUID? = null
+        userId: UUID? = null,
+        category: ProblemCategory? = null
     ): Long
     fun update(
         id: Long,
@@ -45,6 +47,7 @@ interface ProblemRepository {
         maxDifficulty: Int?,
         trialStatus: TrialStatus?,
         userId: UUID?,
-        sort: List<String>
+        sort: List<String>,
+        category: ProblemCategory? = null
     ): List<Problem>
 }
