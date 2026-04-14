@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.problem.presentation.request
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Positive
+import me.suhyun.soj.domain.problem.domain.model.OrmMetadata
 import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 
@@ -20,5 +21,7 @@ data class UpdateProblemRequest(
 
     val isOrderSensitive: Boolean? = null,
 
-    val category: ProblemCategory? = null
+    val category: ProblemCategory? = null,
+
+    val ormMetadata: OrmMetadata? = null
 )

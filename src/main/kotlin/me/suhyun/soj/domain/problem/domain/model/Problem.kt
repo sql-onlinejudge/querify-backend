@@ -10,6 +10,7 @@ data class Problem(
     val description: String,
     val schemaSql: String,
     val schemaMetadata: SchemaMetadata?,
+    val ormMetadata: OrmMetadata? = null,
     val difficulty: Int,
     val timeLimit: Int,
     val isOrderSensitive: Boolean,
