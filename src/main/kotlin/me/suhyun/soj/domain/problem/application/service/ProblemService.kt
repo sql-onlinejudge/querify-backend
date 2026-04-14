@@ -3,6 +3,7 @@ package me.suhyun.soj.domain.problem.application.service
 import me.suhyun.soj.domain.problem.application.event.ProblemEvent
 import me.suhyun.soj.domain.problem.application.event.ProblemEventPublisher
 import me.suhyun.soj.domain.problem.domain.model.Problem
+import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
@@ -66,7 +67,11 @@ class ProblemService(
         )
 
         problemMetadataMongoRepository.save(
-            ProblemMetadataDocument(problemId = savedProblem.id!!, schemaMetadata = request.schemaMetadata)
+            ProblemMetadataDocument(
+                problemId = savedProblem.id!!,
+                schemaMetadata = request.schemaMetadata,
+                ormMetadata = request.ormMetadata
+            )
         )
 
         request.testcases.forEach { input ->
@@ -160,8 +165,11 @@ class ProblemService(
             ?: run {
                 val loaded = problemRepository.findById(problemId)
                     ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
-                val schemaMetadata = problemMetadataMongoRepository.findByProblemId(problemId)?.schemaMetadata
-                val enriched = loaded.copy(schemaMetadata = schemaMetadata)
+                val metadata = problemMetadataMongoRepository.findByProblemId(problemId)
+                val enriched = loaded.copy(
+                    schemaMetadata = metadata?.schemaMetadata,
+                    ormMetadata = metadata?.ormMetadata
+                )
                 cacheProblem(enriched)
                 enriched
             }
@@ -192,12 +200,23 @@ class ProblemService(
             category = request.category
         ) ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
 
-        request.schemaMetadata?.let { metadata ->
+        if (request.schemaMetadata != null || request.ormMetadata != null) {
             val existing = problemMetadataMongoRepository.findByProblemId(problemId)
             if (existing != null) {
-                problemMetadataMongoRepository.save(existing.copy(schemaMetadata = metadata))
+                problemMetadataMongoRepository.save(
+                    existing.copy(
+                        schemaMetadata = request.schemaMetadata ?: existing.schemaMetadata,
+                        ormMetadata = request.ormMetadata ?: existing.ormMetadata
+                    )
+                )
             } else {
-                problemMetadataMongoRepository.save(ProblemMetadataDocument(problemId = problemId, schemaMetadata = metadata))
+                problemMetadataMongoRepository.save(
+                    ProblemMetadataDocument(
+                        problemId = problemId,
+                        schemaMetadata = request.schemaMetadata ?: SchemaMetadata(emptyList()),
+                        ormMetadata = request.ormMetadata
+                    )
+                )
             }
         }
 

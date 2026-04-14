@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.problem.presentation.response
 
+import me.suhyun.soj.domain.problem.domain.model.OrmMetadata
 import me.suhyun.soj.domain.problem.domain.model.Problem
 import me.suhyun.soj.domain.problem.domain.model.SchemaMetadata
 import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
@@ -12,6 +13,7 @@ data class ProblemDetailResponse(
     val description: String,
     val schemaSql: String,
     val schemaMetadata: SchemaMetadata?,
+    val ormMetadata: OrmMetadata?,
     val difficulty: Int,
     val timeLimit: Int,
     val isOrderSensitive: Boolean,
@@ -30,6 +32,7 @@ data class ProblemDetailResponse(
                 description = problem.description,
                 schemaSql = problem.schemaSql,
                 schemaMetadata = problem.schemaMetadata,
+                ormMetadata = problem.ormMetadata,
                 difficulty = problem.difficulty,
                 timeLimit = problem.timeLimit,
                 isOrderSensitive = problem.isOrderSensitive,
