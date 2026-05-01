@@ -59,13 +59,15 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soj-backend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/soj-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/soj-backend:${{ github.sha }}
 
   deploy:
     needs: docker
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to server
+      - name: Blue-Green Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -74,5 +76,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/projects/soj
-            docker compose pull app
-            docker compose up -d app
+            ./deploy.sh ${{ secrets.DOCKERHUB_USERNAME }}/soj-backend:${{ github.sha }}
