@@ -76,4 +76,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/projects/soj
-            ./deploy.sh ${{ secrets.DOCKERHUB_USERNAME }}/soj-backend:${{ github.sha }}
+            APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/soj-backend:${{ github.sha }} ./deploy.sh
