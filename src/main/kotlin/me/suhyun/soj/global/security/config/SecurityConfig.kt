@@ -74,6 +74,7 @@ class SecurityConfig(
                 auth.requestMatchers("/test/login").permitAll()
                 auth.requestMatchers("/auth/logout").permitAll()
                 auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                auth.requestMatchers("/actuator/health").permitAll()
                 auth.requestMatchers("/actuator/**").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.GET, "/problems/**").permitAll()
                 auth.requestMatchers(HttpMethod.POST, "/problems").hasRole("ADMIN")
