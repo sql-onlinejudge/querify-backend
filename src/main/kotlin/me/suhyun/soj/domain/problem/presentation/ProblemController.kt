@@ -62,6 +62,10 @@ class ProblemController(
         )
     }
 
+    @GetMapping("/onboarding")
+    fun getOnboardingProblems(): List<ProblemResponse> =
+        problemService.getOnboardingProblems()
+
     @GetMapping("/{problemId}")
     fun findById(@PathVariable problemId: Long): ProblemDetailResponse {
         return problemService.findById(problemId)
