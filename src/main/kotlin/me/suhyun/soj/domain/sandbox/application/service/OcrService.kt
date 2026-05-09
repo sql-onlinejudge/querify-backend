@@ -6,7 +6,12 @@ import me.suhyun.soj.global.exception.BusinessException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.util.Base64
+import javax.imageio.ImageIO
 
 @Service
 class OcrService(
@@ -16,7 +21,8 @@ class OcrService(
 ) {
 
     fun extractSql(imageBytes: ByteArray, mediaType: String): String {
-        val base64Image = Base64.getEncoder().encodeToString(imageBytes)
+        val (resizedBytes, resolvedMediaType) = resizeImage(imageBytes, mediaType)
+        val base64Image = Base64.getEncoder().encodeToString(resizedBytes)
         val requestBody = mapOf(
             "model" to "claude-haiku-4-5-20251001",
             "max_tokens" to 2048,
@@ -29,7 +35,7 @@ class OcrService(
                             "type" to "image",
                             "source" to mapOf(
                                 "type" to "base64",
-                                "media_type" to mediaType,
+                                "media_type" to resolvedMediaType,
                                 "data" to base64Image
                             )
                         )
@@ -46,6 +52,26 @@ class OcrService(
             .block() ?: throw BusinessException(SandboxErrorCode.OCR_EXTRACTION_FAILED)
 
         return parseSqlFromResponse(responseBody)
+    }
+
+    private fun resizeImage(imageBytes: ByteArray, originalMediaType: String): Pair<ByteArray, String> {
+        val src = ImageIO.read(ByteArrayInputStream(imageBytes))
+            ?: return imageBytes to originalMediaType
+        val maxDim = 1568
+        val scale = minOf(maxDim.toDouble() / src.width, maxDim.toDouble() / src.height, 1.0)
+        if (scale >= 1.0) return imageBytes to originalMediaType
+        val w = (src.width * scale).toInt()
+        val h = (src.height * scale).toInt()
+        val dst = BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+        val g = dst.createGraphics()
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+        g.drawImage(src, 0, 0, w, h, null)
+        g.dispose()
+        val format = if (originalMediaType == "image/jpeg") "jpeg" else "png"
+        val resolvedType = if (originalMediaType == "image/jpeg") "image/jpeg" else "image/png"
+        val out = ByteArrayOutputStream()
+        ImageIO.write(dst, format, out)
+        return out.toByteArray() to resolvedType
     }
 
     private fun parseSqlFromResponse(responseBody: String): String {
