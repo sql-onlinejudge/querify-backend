@@ -19,7 +19,8 @@ class OcrService(
         val base64Image = Base64.getEncoder().encodeToString(imageBytes)
         val requestBody = mapOf(
             "model" to "claude-haiku-4-5-20251001",
-            "max_tokens" to 4096,
+            "max_tokens" to 2048,
+            "system" to "Extract only MySQL DDL (CREATE TABLE) and INSERT INTO statements from SQL exam images. Output SQL only, no explanation.",
             "messages" to listOf(
                 mapOf(
                     "role" to "user",
@@ -31,20 +32,6 @@ class OcrService(
                                 "media_type" to mediaType,
                                 "data" to base64Image
                             )
-                        ),
-                        mapOf(
-                            "type" to "text",
-                            "text" to """
-                                이 이미지는 SQL 자격증 시험 문제지입니다.
-                                이미지에서 테이블 구조와 데이터를 분석하여 MySQL 호환 SQL DDL(CREATE TABLE)과 데이터 삽입(INSERT INTO) 구문만 추출해 주세요.
-                                Oracle/표준 SQL 타입을 MySQL 타입으로 반드시 변환하세요:
-                                - NUMBER, NUMBER(p) → INT
-                                - NUMBER(p,s) → DECIMAL(p,s)
-                                - VARCHAR2(n) → VARCHAR(n)
-                                - CLOB → TEXT
-                                - BLOB → LONGBLOB
-                                다른 설명 없이 SQL 구문만 출력하세요. 여러 테이블과 INSERT가 있으면 모두 포함하세요.
-                            """.trimIndent()
                         )
                     )
                 )
