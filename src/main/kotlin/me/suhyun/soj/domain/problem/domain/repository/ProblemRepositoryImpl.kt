@@ -135,14 +135,14 @@ class ProblemRepositoryImpl : ProblemRepository {
     }
 
     override fun incrementSubmittedCount(id: Long) {
-        ProblemTable.update({ ProblemTable.id eq id }) {
+        ProblemTable.update({ (ProblemTable.id eq id) and ProblemTable.deletedAt.isNull() }) {
             it[submissionCount] = submissionCount + 1
             it[updatedAt] = LocalDateTime.now()
         }
     }
 
     override fun incrementSolvedCount(id: Long) {
-        ProblemTable.update({ ProblemTable.id eq id }) {
+        ProblemTable.update({ (ProblemTable.id eq id) and ProblemTable.deletedAt.isNull() }) {
             it[solvedCount] = solvedCount + 1
             it[updatedAt] = LocalDateTime.now()
         }
