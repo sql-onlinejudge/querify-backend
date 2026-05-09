@@ -188,6 +188,23 @@ class ProblemService(
         }
     }
 
+    @Transactional(readOnly = true)
+    fun getOnboardingProblems(): List<ProblemResponse> {
+        val userId = SecurityContextHolder.getContext().authentication?.principal as? UUID
+        val problems = problemRepository.findAll(
+            page = 0,
+            size = 5,
+            minDifficulty = 1,
+            maxDifficulty = 5,
+            keyword = null,
+            sort = listOf("solvedCount:desc"),
+            trialStatus = if (userId != null) TrialStatus.NOT_ATTEMPTED else null,
+            userId = userId
+        )
+        val trialStatuses = if (userId != null) getTrialStatuses(problems.mapNotNull { it.id }, userId) else emptyMap()
+        return problems.map { ProblemResponse.from(it, trialStatuses[it.id]) }
+    }
+
     fun update(problemId: Long, request: UpdateProblemRequest) {
         val schemaSql = request.schemaMetadata?.let { SqlGenerator.generateSchema(it) }
         problemRepository.update(
