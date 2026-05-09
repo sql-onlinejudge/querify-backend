@@ -162,6 +162,7 @@ class ProblemService(
     fun findById(problemId: Long): ProblemDetailResponse {
         val userId = SecurityContextHolder.getContext().authentication?.principal as? UUID
         val problem = getCachedProblem(problemId)
+            ?.takeIf { it.deletedAt == null }
             ?: run {
                 val loaded = problemRepository.findById(problemId)
                     ?: throw BusinessException(ProblemErrorCode.PROBLEM_NOT_FOUND)
