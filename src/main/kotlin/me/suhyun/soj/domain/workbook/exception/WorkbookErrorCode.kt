@@ -9,5 +9,6 @@ enum class WorkbookErrorCode(
 ) : ErrorCode {
     WORKBOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "찾을 수 없는 문제집입니다."),
     WORKBOOK_PROBLEM_NOT_FOUND(HttpStatus.NOT_FOUND, "찾을 수 없는 문제집 문제입니다."),
-    WORKBOOK_PROBLEM_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 문제집에 추가된 문제입니다.")
+    WORKBOOK_PROBLEM_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 문제집에 추가된 문제입니다."),
+    PREMIUM_REQUIRED(HttpStatus.FORBIDDEN, "프리미엄 구독이 필요합니다.")
 }

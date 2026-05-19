@@ -151,3 +151,10 @@ cache:
     user: 60m
     problem: 30m
     testcase: 30m
+    subscription: 5m
+
+toss:
+  client-key: ${TOSS_CLIENT_KEY:test_ck_placeholder}
+  secret-key: ${TOSS_SECRET_KEY:test_sk_placeholder}
+  success-url: ${TOSS_SUCCESS_URL:http://localhost:8080/payments/success}
+  fail-url: ${TOSS_FAIL_URL:http://localhost:8080/payments/fail}

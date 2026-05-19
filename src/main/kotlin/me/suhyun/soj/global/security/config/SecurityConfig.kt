@@ -97,6 +97,10 @@ class SecurityConfig(
                 auth.requestMatchers(HttpMethod.DELETE, "/runs/sandbox/*").authenticated()
                 auth.requestMatchers(HttpMethod.POST, "/runs/sandbox/*/reactivate").authenticated()
                 auth.requestMatchers(HttpMethod.POST, "/auth/merge-guest").authenticated()
+                auth.requestMatchers(HttpMethod.POST, "/payments/checkout").authenticated()
+                auth.requestMatchers(HttpMethod.GET, "/payments/**").permitAll()
+                auth.requestMatchers(HttpMethod.GET, "/subscriptions/me").authenticated()
+                auth.requestMatchers(HttpMethod.POST, "/problems/*/submissions/*/feedback").authenticated()
                 auth.requestMatchers("/admin/**").authenticated()
                 auth.anyRequest().authenticated()
             }

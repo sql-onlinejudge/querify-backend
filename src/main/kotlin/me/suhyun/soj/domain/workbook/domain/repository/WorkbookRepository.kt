@@ -19,6 +19,6 @@ interface WorkbookRepository {
         maxDifficulty: Int?,
         keyword: String?,
     ): Long
-    fun update(id: Long, name: String?, description: String?, difficulty: Long?): Workbook?
+    fun update(id: Long, name: String?, description: String?, difficulty: Long?, isPremium: Boolean?): Workbook?
     fun softDelete(id: Long): Boolean
 }

@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.workbook.application.service
 
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.Workbook
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
@@ -8,14 +9,17 @@ import me.suhyun.soj.domain.workbook.presentation.request.UpdateWorkbookRequest
 import me.suhyun.soj.domain.workbook.presentation.response.WorkbookResponse
 import me.suhyun.soj.global.common.dto.PageResponse
 import me.suhyun.soj.global.exception.BusinessException
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 @Transactional
 class WorkbookService(
-    private val workbookRepository: WorkbookRepository
+    private val workbookRepository: WorkbookRepository,
+    private val subscriptionService: SubscriptionService
 ) {
 
     fun create(request: CreateWorkbookRequest) {
@@ -25,6 +29,7 @@ class WorkbookService(
                 name = request.name,
                 description = request.description,
                 difficulty = request.difficulty,
+                isPremium = request.isPremium,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null
@@ -32,7 +37,6 @@ class WorkbookService(
         )
     }
 
-    // TODO 문제집 문제 추가, 문제수 조회, 문제집 문제 조회(페이징), 문제집 문제 삭제
     @Transactional(readOnly = true)
     fun findAll(
         page: Int,
@@ -56,6 +60,14 @@ class WorkbookService(
     fun findById(workbookId: Long): WorkbookResponse {
         val workbook = workbookRepository.findById(workbookId)
             ?: throw BusinessException(WorkbookErrorCode.WORKBOOK_NOT_FOUND)
+
+        if (workbook.isPremium) {
+            val userId = SecurityContextHolder.getContext().authentication?.principal as? UUID
+            if (userId == null || !subscriptionService.isActive(userId)) {
+                throw BusinessException(WorkbookErrorCode.PREMIUM_REQUIRED)
+            }
+        }
+
         return WorkbookResponse.from(workbook)
     }
 
@@ -64,7 +76,8 @@ class WorkbookService(
             id = workbookId,
             name = request.name,
             description = request.description,
-            difficulty = request.difficulty
+            difficulty = request.difficulty,
+            isPremium = request.isPremium
         ) ?: throw BusinessException(WorkbookErrorCode.WORKBOOK_NOT_FOUND)
     }
 
@@ -73,6 +86,5 @@ class WorkbookService(
         if (!deleted) {
             throw BusinessException(WorkbookErrorCode.WORKBOOK_NOT_FOUND)
         }
-        // TODO 연관된 거 삭제
     }
 }

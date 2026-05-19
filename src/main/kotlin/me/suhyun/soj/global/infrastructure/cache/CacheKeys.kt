@@ -17,4 +17,8 @@ object CacheKeys {
     object TestCase {
         fun byProblemId(problemId: Long) = "$PREFIX:testcase:$problemId"
     }
+
+    object Subscription {
+        fun byUserId(userId: UUID) = "$PREFIX:subscription:$userId"
+    }
 }

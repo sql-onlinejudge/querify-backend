@@ -19,6 +19,7 @@ class WorkbookRepositoryImpl : WorkbookRepository {
             this.name = workbook.name
             this.description = workbook.description
             this.difficulty = workbook.difficulty
+            this.isPremium = workbook.isPremium
             this.createdAt = LocalDateTime.now()
         }
         return Workbook.from(entity)
@@ -62,7 +63,8 @@ class WorkbookRepositoryImpl : WorkbookRepository {
         id: Long,
         name: String?,
         description: String?,
-        difficulty: Long?
+        difficulty: Long?,
+        isPremium: Boolean?
     ): Workbook? {
         val entity = WorkbookEntity.findById(id)
             ?.takeIf { it.deletedAt == null }
@@ -71,6 +73,7 @@ class WorkbookRepositoryImpl : WorkbookRepository {
         name?.let { entity.name = it }
         description?.let { entity.description = it }
         difficulty?.let { entity.difficulty = it }
+        isPremium?.let { entity.isPremium = it }
         entity.updatedAt = LocalDateTime.now()
 
         return Workbook.from(entity)
