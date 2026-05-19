@@ -9,7 +9,6 @@ import me.suhyun.soj.domain.payment.infrastructure.toss.TossPaymentsProperties
 import me.suhyun.soj.domain.payment.presentation.response.CheckoutResponse
 import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.global.exception.BusinessException
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -17,7 +16,6 @@ import java.util.UUID
 
 @Service
 @Transactional
-@EnableConfigurationProperties(TossPaymentsProperties::class)
 class PaymentService(
     private val paymentRepository: PaymentRepository,
     private val subscriptionService: SubscriptionService,
