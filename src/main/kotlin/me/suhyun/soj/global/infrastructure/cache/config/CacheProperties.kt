@@ -12,6 +12,7 @@ data class CacheProperties(
         val default: Duration = Duration.ofMinutes(10),
         val user: Duration = Duration.ofMinutes(60),
         val problem: Duration = Duration.ofMinutes(30),
-        val testcase: Duration = Duration.ofMinutes(30)
+        val testcase: Duration = Duration.ofMinutes(30),
+        val subscription: Duration = Duration.ofMinutes(5)
     )
 }
