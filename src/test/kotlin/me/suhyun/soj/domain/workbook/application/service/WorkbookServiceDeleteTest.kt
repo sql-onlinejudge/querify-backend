@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.workbook.application.service
 
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
 import me.suhyun.soj.global.exception.BusinessException
@@ -18,11 +19,14 @@ class WorkbookServiceDeleteTest {
     @Mock
     private lateinit var workbookRepository: WorkbookRepository
 
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
+
     private lateinit var workbookService: WorkbookService
 
     @BeforeEach
     fun setUp() {
-        workbookService = WorkbookService(workbookRepository)
+        workbookService = WorkbookService(workbookRepository, subscriptionService)
     }
 
     @Test

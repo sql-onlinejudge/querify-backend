@@ -2,8 +2,10 @@ package me.suhyun.soj.domain.workbook.application.service
 
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.WorkbookProblem
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookProblemRepository
+import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
 import me.suhyun.soj.global.exception.BusinessException
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -22,16 +24,22 @@ class WorkbookProblemServiceDeleteTest {
     private lateinit var workbookProblemRepository: WorkbookProblemRepository
 
     @Mock
+    private lateinit var workbookRepository: WorkbookRepository
+
+    @Mock
     private lateinit var problemRepository: ProblemRepository
 
     @Mock
     private lateinit var submissionRepository: SubmissionRepository
 
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
+
     private lateinit var workbookProblemService: WorkbookProblemService
 
     @BeforeEach
     fun setUp() {
-        workbookProblemService = WorkbookProblemService(workbookProblemRepository, problemRepository, submissionRepository)
+        workbookProblemService = WorkbookProblemService(workbookProblemRepository, workbookRepository, problemRepository, submissionRepository, subscriptionService)
     }
 
     @Test
