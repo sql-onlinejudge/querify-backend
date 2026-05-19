@@ -4,8 +4,10 @@ import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.problem.presentation.response.ProblemResponse
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.WorkbookProblem
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookProblemRepository
+import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
 import me.suhyun.soj.domain.workbook.presentation.request.CreateWorkbookProblemRequest
 import me.suhyun.soj.global.common.dto.PageResponse
@@ -19,8 +21,10 @@ import java.util.UUID
 @Transactional
 class WorkbookProblemService(
     private val workbookProblemRepository: WorkbookProblemRepository,
+    private val workbookRepository: WorkbookRepository,
     private val problemRepository: ProblemRepository,
     private val submissionRepository: SubmissionRepository,
+    private val subscriptionService: SubscriptionService
 ) {
     fun create(workbookId: Long, request: CreateWorkbookProblemRequest) {
         val existing = workbookProblemRepository.findByWorkbookIdAndProblemId(workbookId, request.problemId)
@@ -42,7 +46,15 @@ class WorkbookProblemService(
         page: Int,
         size: Int,
     ): PageResponse<ProblemResponse> {
+        val workbook = workbookRepository.findById(workbookId)
+            ?: throw BusinessException(WorkbookErrorCode.WORKBOOK_NOT_FOUND)
+
         val userId = SecurityContextHolder.getContext().authentication?.principal as? UUID
+
+        if (workbook.isPremium && (userId == null || !subscriptionService.isActive(userId))) {
+            throw BusinessException(WorkbookErrorCode.PREMIUM_REQUIRED)
+        }
+
         val workbookProblems = workbookProblemRepository.findAllByWorkbookId(workbookId, page, size)
         val totalElements = workbookProblemRepository.countByWorkbookId(workbookId)
 

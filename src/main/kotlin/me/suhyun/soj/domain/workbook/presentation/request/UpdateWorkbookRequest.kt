@@ -4,4 +4,5 @@ data class UpdateWorkbookRequest(
     val name: String,
     val description: String,
     val difficulty: Long,
+    val isPremium: Boolean? = null,
 )

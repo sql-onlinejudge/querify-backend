@@ -4,4 +4,5 @@ data class CreateWorkbookRequest(
     val name: String,
     val description: String,
     val difficulty: Long,
+    val isPremium: Boolean = false,
 )

@@ -8,6 +8,7 @@ data class WorkbookResponse(
     val name: String,
     val description: String,
     val difficulty: Long,
+    val isPremium: Boolean,
     val createdAt: LocalDateTime?,
 ) {
     companion object {
@@ -17,6 +18,7 @@ data class WorkbookResponse(
                 name = model.name,
                 description = model.description,
                 difficulty = model.difficulty,
+                isPremium = model.isPremium,
                 createdAt = model.createdAt,
             )
         }

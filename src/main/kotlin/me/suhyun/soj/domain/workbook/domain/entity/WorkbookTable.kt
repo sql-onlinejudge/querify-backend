@@ -7,4 +7,5 @@ object WorkbookTable : BaseTable("workbooks") {
     val name = varchar("name", 128)
     val description = text("description")
     val difficulty = long("difficulty").default(3)
+    val isPremium = bool("is_premium").default(false)
 }

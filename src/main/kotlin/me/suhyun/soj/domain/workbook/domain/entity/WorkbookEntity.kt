@@ -10,6 +10,7 @@ class WorkbookEntity(id: EntityID<Long>) : LongEntity(id) {
     var name by WorkbookTable.name
     var description by WorkbookTable.description
     var difficulty by WorkbookTable.difficulty
+    var isPremium by WorkbookTable.isPremium
     var createdAt by WorkbookTable.createdAt
     var updatedAt by WorkbookTable.updatedAt
     var deletedAt by WorkbookTable.deletedAt
