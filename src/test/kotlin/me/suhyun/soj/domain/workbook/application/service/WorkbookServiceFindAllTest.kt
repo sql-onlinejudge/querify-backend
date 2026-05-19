@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.workbook.application.service
 
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.Workbook
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -17,18 +18,21 @@ class WorkbookServiceFindAllTest {
     @Mock
     private lateinit var workbookRepository: WorkbookRepository
 
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
+
     private lateinit var workbookService: WorkbookService
 
     @BeforeEach
     fun setUp() {
-        workbookService = WorkbookService(workbookRepository)
+        workbookService = WorkbookService(workbookRepository, subscriptionService)
     }
 
     @Test
     fun `should return paginated workbook list`() {
         val workbooks = listOf(
-            Workbook(1L, "문제집1", "설명1", 1, LocalDateTime.now(), null, null),
-            Workbook(2L, "문제집2", "설명2", 2, LocalDateTime.now(), null, null),
+            Workbook(1L, "문제집1", "설명1", 1, false, LocalDateTime.now(), null, null),
+            Workbook(2L, "문제집2", "설명2", 2, false, LocalDateTime.now(), null, null),
         )
 
         whenever(workbookRepository.findAll(0, 20, null, null, null, listOf("id:desc"))).thenReturn(workbooks)

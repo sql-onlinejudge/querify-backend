@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.workbook.application.service
 
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.Workbook
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
@@ -20,11 +21,14 @@ class WorkbookServiceFindByIdTest {
     @Mock
     private lateinit var workbookRepository: WorkbookRepository
 
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
+
     private lateinit var workbookService: WorkbookService
 
     @BeforeEach
     fun setUp() {
-        workbookService = WorkbookService(workbookRepository)
+        workbookService = WorkbookService(workbookRepository, subscriptionService)
     }
 
     @Test
@@ -34,6 +38,7 @@ class WorkbookServiceFindByIdTest {
             name = "SQL 기초",
             description = "SQL 기초 문제집",
             difficulty = 1,
+            isPremium = false,
             createdAt = LocalDateTime.now(),
             updatedAt = null,
             deletedAt = null

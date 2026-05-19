@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.workbook.application.service
 
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.Workbook
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.exception.WorkbookErrorCode
@@ -21,31 +22,34 @@ class WorkbookServiceUpdateTest {
     @Mock
     private lateinit var workbookRepository: WorkbookRepository
 
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
+
     private lateinit var workbookService: WorkbookService
 
     @BeforeEach
     fun setUp() {
-        workbookService = WorkbookService(workbookRepository)
+        workbookService = WorkbookService(workbookRepository, subscriptionService)
     }
 
     @Test
     fun `should update workbook successfully`() {
         val request = UpdateWorkbookRequest(name = "수정된 이름", description = "수정된 설명", difficulty = 5)
 
-        whenever(workbookRepository.update(1L, request.name, request.description, request.difficulty)).thenReturn(
-            Workbook(1L, request.name, request.description, request.difficulty, LocalDateTime.now(), LocalDateTime.now(), null)
+        whenever(workbookRepository.update(1L, request.name, request.description, request.difficulty, null)).thenReturn(
+            Workbook(1L, request.name, request.description, request.difficulty, false, LocalDateTime.now(), LocalDateTime.now(), null)
         )
 
         workbookService.update(1L, request)
 
-        verify(workbookRepository).update(1L, request.name, request.description, request.difficulty)
+        verify(workbookRepository).update(1L, request.name, request.description, request.difficulty, null)
     }
 
     @Test
     fun `should throw WORKBOOK_NOT_FOUND when updating non-existent workbook`() {
         val request = UpdateWorkbookRequest(name = "이름", description = "설명", difficulty = 1)
 
-        whenever(workbookRepository.update(999L, request.name, request.description, request.difficulty)).thenReturn(null)
+        whenever(workbookRepository.update(999L, request.name, request.description, request.difficulty, null)).thenReturn(null)
 
         assertThatThrownBy { workbookService.update(999L, request) }
             .isInstanceOf(BusinessException::class.java)

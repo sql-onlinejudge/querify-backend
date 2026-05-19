@@ -5,8 +5,11 @@ import me.suhyun.soj.domain.problem.domain.model.enums.ProblemCategory
 import me.suhyun.soj.domain.problem.domain.model.enums.TrialStatus
 import me.suhyun.soj.domain.problem.domain.repository.ProblemRepository
 import me.suhyun.soj.domain.submission.domain.repository.SubmissionRepository
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
+import me.suhyun.soj.domain.workbook.domain.model.Workbook
 import me.suhyun.soj.domain.workbook.domain.model.WorkbookProblem
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookProblemRepository
+import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -28,10 +31,16 @@ class WorkbookProblemServiceFindAllTest {
     private lateinit var workbookProblemRepository: WorkbookProblemRepository
 
     @Mock
+    private lateinit var workbookRepository: WorkbookRepository
+
+    @Mock
     private lateinit var problemRepository: ProblemRepository
 
     @Mock
     private lateinit var submissionRepository: SubmissionRepository
+
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
 
     private lateinit var workbookProblemService: WorkbookProblemService
 
@@ -39,7 +48,7 @@ class WorkbookProblemServiceFindAllTest {
 
     @BeforeEach
     fun setUp() {
-        workbookProblemService = WorkbookProblemService(workbookProblemRepository, problemRepository, submissionRepository)
+        workbookProblemService = WorkbookProblemService(workbookProblemRepository, workbookRepository, problemRepository, submissionRepository, subscriptionService)
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken(userId, null, listOf(SimpleGrantedAuthority("ROLE_USER")))
     }
@@ -51,6 +60,10 @@ class WorkbookProblemServiceFindAllTest {
 
     @Test
     fun `should return paginated problems for workbook with trialStatus`() {
+        whenever(workbookRepository.findById(1L)).thenReturn(
+            Workbook(1L, "테스트", "설명", 1, false, LocalDateTime.now(), null, null)
+        )
+
         val workbookProblems = listOf(
             WorkbookProblem(id = 1L, workbookId = 1L, problemId = 10L),
             WorkbookProblem(id = 2L, workbookId = 1L, problemId = 20L),
@@ -75,6 +88,10 @@ class WorkbookProblemServiceFindAllTest {
 
     @Test
     fun `should return empty page when no problems in workbook`() {
+        whenever(workbookRepository.findById(1L)).thenReturn(
+            Workbook(1L, "테스트", "설명", 1, false, LocalDateTime.now(), null, null)
+        )
+
         whenever(workbookProblemRepository.findAllByWorkbookId(1L, 0, 20)).thenReturn(emptyList())
         whenever(workbookProblemRepository.countByWorkbookId(1L)).thenReturn(0L)
 

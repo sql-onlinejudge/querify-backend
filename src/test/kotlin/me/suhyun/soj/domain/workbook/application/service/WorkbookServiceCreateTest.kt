@@ -1,5 +1,6 @@
 package me.suhyun.soj.domain.workbook.application.service
 
+import me.suhyun.soj.domain.subscription.application.service.SubscriptionService
 import me.suhyun.soj.domain.workbook.domain.model.Workbook
 import me.suhyun.soj.domain.workbook.domain.repository.WorkbookRepository
 import me.suhyun.soj.domain.workbook.presentation.request.CreateWorkbookRequest
@@ -19,11 +20,14 @@ class WorkbookServiceCreateTest {
     @Mock
     private lateinit var workbookRepository: WorkbookRepository
 
+    @Mock
+    private lateinit var subscriptionService: SubscriptionService
+
     private lateinit var workbookService: WorkbookService
 
     @BeforeEach
     fun setUp() {
-        workbookService = WorkbookService(workbookRepository)
+        workbookService = WorkbookService(workbookRepository, subscriptionService)
     }
 
     @Test
@@ -40,6 +44,7 @@ class WorkbookServiceCreateTest {
                 name = request.name,
                 description = request.description,
                 difficulty = request.difficulty,
+                isPremium = false,
                 createdAt = LocalDateTime.now(),
                 updatedAt = null,
                 deletedAt = null
